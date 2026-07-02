@@ -5,9 +5,11 @@ const mongoose = require("mongoose");
 const route = require("./Route/UserRoute")
 
 const app = express();
+const cors = require('cors');
 
 //Middleware
 app.use(express.json());
+app.use(cors());
 app.use("/users",route);
 
 
