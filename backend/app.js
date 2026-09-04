@@ -1,22 +1,40 @@
-//password =khYUy5jxGOLuLeiV
+// panndkumpu1922_db_user
+// GXVsYss7QjirazBN
+
+// mongodb+srv://<db_username>:GXVsYss7QjirazBN@cluster0.w08urdq.mongodb.net/?appName=Cluster0
+
+const dns = require("dns");
+
+dns.setServers([
+    "8.8.8.8",
+    "8.8.4.4"
+]);
 
 const express = require("express");
 const mongoose = require("mongoose");
-const route = require("./Route/UserRoute")
+const route = require("./Route/UserRoute");
+const cors = require("cors");
 
 const app = express();
-const cors = require('cors');
 
-//Middleware
 app.use(express.json());
 app.use(cors());
-app.use("/users",route);
 
+app.use("/users", route);
 
-mongoose.connect("mongodb://admin:khYUy5jxGOLuLeiV@ac-3mwk9wg-shard-00-00.lubzwkq.mongodb.net:27017,ac-3mwk9wg-shard-00-01.lubzwkq.mongodb.net:27017,ac-3mwk9wg-shard-00-02.lubzwkq.mongodb.net:27017/?ssl=true&replicaSet=atlas-hrf414-shard-0&authSource=admin&appName=Cluster0")
-    .then(() => console.log("Connect mongo db"))
+mongoose.connect("mongodb+srv://panndkumpu1922_db_user:GXVsYss7QjirazBN@cluster0.w08urdq.mongodb.net/")
     .then(() => {
-        app.listen(5000, () => console.log("Server running on port 5000"));
+        console.log("MongoDB connected successfully");
+
+        app.listen(5000, () => {
+            console.log("Server running on port 5000");
+        });
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+        console.error("MongoDB connection failed:");
+        console.error(error);
+    });
     
+
+
+
