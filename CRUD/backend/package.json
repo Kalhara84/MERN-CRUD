@@ -1,12 +1,13 @@
 {
   "name": "curd-backend-simple",
   "version": "1.0.0",
-  "description": "Simple Node.js + Express + PostgreSQL API (users + expire module)",
+  "description": "Simple Node.js + Express + PostgreSQL API (users + expire module + customers)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "db:setup": "node setup.js"
+    "db:setup": "node setup.js",
+    "db:import-customers": "node import-customers.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

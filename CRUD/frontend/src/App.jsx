@@ -11,6 +11,8 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import UserListPage from './pages/UserListPage';
 import UserFormPage from './pages/UserFormPage';
+import CustomerListPage from './pages/CustomerListPage';
+import CustomerFormPage from './pages/CustomerFormPage';
 import ExpireListPage from './pages/ExpireListPage';
 import ExpireFormPage from './pages/ExpireFormPage';
 
@@ -76,6 +78,11 @@ export default function App() {
         <Route path="/expire" element={<ExpireListPage showMessage={showMessage} />} />
         <Route path="/expire/add" element={<ExpireFormPage showMessage={showMessage} />} />
         <Route path="/expire/:id/edit" element={<ExpireFormPage showMessage={showMessage} />} />
+
+        {/* Customers (all logged-in users) */}
+        <Route path="/customers" element={<CustomerListPage showMessage={showMessage} />} />
+        <Route path="/customers/add" element={<CustomerFormPage showMessage={showMessage} />} />
+        <Route path="/customers/:id/edit" element={<CustomerFormPage showMessage={showMessage} />} />
 
         {/* Users (admin only) */}
         <Route path="/users" element={adminOnly(<UserListPage me={user} showMessage={showMessage} />)} />

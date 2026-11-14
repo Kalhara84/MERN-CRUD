@@ -12,6 +12,9 @@ backend/                 the API (Node.js + Express)
   auth.js                login + "is the user logged in?" checks
   users.js               Users page API   (list / add / edit / delete)
   expire.js              Expire Module API (entries, lines, combo boxes, Add Location)
+  customers.js           Customers API    (list / add / edit / delete, combo boxes, next code)
+  import-customers.js    loads the old customers from seed/customers.json   (npm run db:import-customers)
+  seed/customers.json    the old customers (taken from the old database)
   setup.js               creates the tables + starting data   (npm run db:setup)
 
 frontend/                the screens (React + Vite)
@@ -22,7 +25,7 @@ frontend/                the screens (React + Vite)
     api.js               the ONLY file that talks to the backend
     helpers.js           app name + date helpers
     components/          Layout.jsx (menu + top bar), Modal.jsx (pop-ups)
-    pages/               Login, Dashboard, UserList, UserForm, ExpireList, ExpireForm
+    pages/               Login, Dashboard, UserList, UserForm, ExpireList, ExpireForm, CustomerList, CustomerForm
 ```
 
 ## How one click travels (example: opening the Users page)
@@ -51,6 +54,7 @@ You need Node.js 18+ and a PostgreSQL server.
    cp .env.example .env      # open .env and set DB_NAME, DB_PASSWORD ...
    npm install
    npm run db:setup          # creates tables + 2 users + sample combo box data
+   npm run db:import-customers   # (optional) loads the 730 old customers
    npm run dev               # API on http://localhost:5000
    ```
 

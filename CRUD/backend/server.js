@@ -4,6 +4,7 @@
 //   auth.js    -> /api/auth/...     (login)
 //   users.js   -> /api/users/...    (admin only)
 //   expire.js  -> /api/expire/...   (all logged-in users)
+//   customers.js -> /api/customers/... (all logged-in users)
 // =============================================================================
 require('dotenv').config();
 const express = require('express');
@@ -20,6 +21,7 @@ app.use(express.json());  // reads the JSON the browser sends
 app.use('/api/auth', authRouter);
 app.use('/api/users', loginRequired, adminOnly, require('./users'));
 app.use('/api/expire', loginRequired, require('./expire'));
+app.use('/api/customers', loginRequired, require('./customers'));
 
 // GET /api/dashboard - the 3 number cards (admin users only)
 app.get('/api/dashboard', loginRequired, async (req, res) => {

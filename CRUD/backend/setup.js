@@ -1,5 +1,6 @@
 // =============================================================================
 // setup.js - creates the tables and adds the starting data.      npm run db:setup
+// (the old customers can be loaded afterwards with:  npm run db:import-customers)
 // It is safe to run again: tables and rows that already exist are kept.
 //
 // Starting logins:   2000 / "2000 rbf"      and      ADMIN / "0777289242"
@@ -80,6 +81,53 @@ const TABLES = `
     UNIQUE (genctl, gensub)
   );
 
+  -- ---------------------------------------------------------------------------
+  -- Customers
+  -- ---------------------------------------------------------------------------
+
+  -- Small list table used by the Customer drop-downs.
+  -- sysrtp tells which list a row belongs to:  16 = Customer Category,  410 = Credit Terms
+  CREATE TABLE IF NOT EXISTS sysmast (
+    syssno SERIAL PRIMARY KEY,
+    sysrtp INTEGER     NOT NULL,
+    sysrno VARCHAR(25) NOT NULL,
+    sysdes VARCHAR(50) NOT NULL DEFAULT '',
+    UNIQUE (sysrtp, sysrno)
+  );
+
+  -- Sales reps (the "Rep" drop-down of a customer)
+  CREATE TABLE IF NOT EXISTS repmast (
+    repsno SERIAL PRIMARY KEY,
+    reprep VARCHAR(15) NOT NULL UNIQUE,                 -- rep code
+    repnam VARCHAR(50) NOT NULL DEFAULT ''              -- rep name
+  );
+
+  -- Customers
+  CREATE TABLE IF NOT EXISTS cusmast (
+    cussno          SERIAL PRIMARY KEY,
+    cuscus          VARCHAR(20)  NOT NULL UNIQUE,       -- customer code
+    cusnam          VARCHAR(100) NOT NULL,              -- customer name
+    cuscatsno       INTEGER      NOT NULL DEFAULT 0,    -- Category id   (sysmast, sysrtp = 16)
+    cuscredittmssno INTEGER      NOT NULL DEFAULT 0,    -- Credit Terms id (sysmast, sysrtp = 410)
+    cuscreditlimit  NUMERIC(12,0) NOT NULL DEFAULT 0,   -- Credit Limit
+    cusrepsno       INTEGER      NOT NULL DEFAULT 0,    -- Rep id        (repmast)
+    cusadd          VARCHAR(200) NOT NULL DEFAULT '',   -- full address
+    cusad1          VARCHAR(40)  NOT NULL DEFAULT '',
+    cusad2          VARCHAR(40)  NOT NULL DEFAULT '',
+    cusad3          VARCHAR(40)  NOT NULL DEFAULT '',
+    cusad4          VARCHAR(40)  NOT NULL DEFAULT '',
+    cusad5          VARCHAR(40)  NOT NULL DEFAULT '',
+    custelno        VARCHAR(25)  NOT NULL DEFAULT '',
+    cusfaxno        VARCHAR(25)  NOT NULL DEFAULT '',
+    cusemail        VARCHAR(50)  NOT NULL DEFAULT '',
+    custinno        VARCHAR(20)  NOT NULL DEFAULT '',   -- TIN
+    cusvatno        VARCHAR(15)  NOT NULL DEFAULT '',   -- VAT reg no
+    cussvatno       VARCHAR(25)  NOT NULL DEFAULT '',   -- SVAT reg no
+    cusactyn        VARCHAR(1)   NOT NULL DEFAULT 'Y',  -- N = not active
+    cusucdnew VARCHAR(30), cusentddt DATE, cusenttime TIME,   -- created by / date / time
+    cusucdame VARCHAR(30), cusameddt DATE, cusametime TIME    -- updated by / date / time
+  );
+
   -- Expire entry: header
   CREATE TABLE IF NOT EXISTS exhmast (
     exhsno      SERIAL PRIMARY KEY,
@@ -119,10 +167,10 @@ async function main() {
   const { date, time } = nowLocal();
   await seed(
     `INSERT INTO usdmast (usdusd, usdnam, usdpwd, usdemail, usdadmin, usdactflg, usducdnew, usdentddt, usdenttime, usducdame, usdameddt, usdametime)
-     VALUES ($1, $2, $3, $4, 'Y', 'Y', 'SETUP', $5, $6, 'SETUP', $5, $6)`,
+     VALUES ($1, $2, $3, $4, 'Y', 'Y', 'SETUP', $5, $6, 'SETUP', $7, $8)`,
     [
-      ['2000', '2000', bcrypt.hashSync('2000 rbf', 10), 'rumeshdezoysa@gmail.com', date, time],
-      ['ADMIN', 'ADMIN', bcrypt.hashSync('0777289242', 10), '', date, time],
+      ['2000', '2000', bcrypt.hashSync('2000 rbf', 10), 'rumeshdezoysa@gmail.com', date, time, date, time],
+      ['ADMIN', 'ADMIN', bcrypt.hashSync('0777289242', 10), '', date, time, date, time],
     ]
   );
 
@@ -144,6 +192,19 @@ async function main() {
     ['1300', '001', 'Packing Material Stock'], ['5100', '001', 'Expired Stock Write-off'],
     ['5100', '002', 'Damaged Stock Write-off'], ['5200', '001', 'Stock Adjustment'],
   ]);
+
+  // ---- Customer drop-down lists (the ids are the same as in the old database,
+  //      so the old customers still point to the right Category / Credit Terms)
+  const lists = [
+    [374, 16, 'Direct Sales', 'Direct Sales'], [303, 16, 'OTHERS', 'OTHERS'],
+    [602, 410, 'COD', 'COD'], [613, 410, 'CQ3', 'CQ3'], [614, 410, 'CSD', 'CSD'], [603, 410, 'CSH', 'CSH'],
+    [604, 410, 'N1', 'N1'], [607, 410, 'N14', 'N14'], [608, 410, 'N17', 'N17'], [605, 410, 'N3', 'N3'],
+    [609, 410, 'N30', 'N30'], [610, 410, 'N37', 'N37'], [612, 410, 'N40', 'N40'], [611, 410, 'N60', 'N60'],
+    [606, 410, 'N7', 'N7'],
+  ];
+  await seed('INSERT INTO sysmast (syssno, sysrtp, sysrno, sysdes) VALUES ($1, $2, $3, $4)', lists);
+  // SERIAL does not know about the ids we typed above, so move its counter forward
+  await pool.query("SELECT setval(pg_get_serial_sequence('sysmast', 'syssno'), (SELECT MAX(syssno) FROM sysmast))");
 
   console.log('Starting data ready.  Login: 2000 / "2000 rbf"   or   ADMIN / "0777289242"');
 }

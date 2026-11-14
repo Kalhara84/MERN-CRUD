@@ -7,6 +7,9 @@ function getTitle(path) {
   if (path === '/users') return 'Users';
   if (path === '/users/add') return 'Add user';
   if (path.startsWith('/users/')) return 'Edit user';
+  if (path === '/customers') return 'Customers';
+  if (path === '/customers/add') return 'Add customer';
+  if (path.startsWith('/customers/')) return 'Edit customer';
   if (path.startsWith('/expire')) return 'Expire Module';
   return 'Dashboard';
 }
@@ -61,6 +64,10 @@ export default function Layout({ user, message, onCloseMessage, onLogout, childr
               <NavLink className={linkClass} to="/users"><i className="bi bi-people" /> Users</NavLink>
             </>
           )}
+
+          {/* Customers: every logged-in user sees it (below the Users link) */}
+          <div className="jw-nav-title">Master Data</div>
+          <NavLink className={linkClass} to="/customers"><i className="bi bi-person-lines-fill" /> Customers</NavLink>
         </nav>
         <div className="jw-side-foot">
           <button type="button" className="btn btn-dark-gold btn-sm w-100" onClick={logout}>
