@@ -119,11 +119,20 @@ const TABLES = `
     cusad5          VARCHAR(40)  NOT NULL DEFAULT '',
     custelno        VARCHAR(25)  NOT NULL DEFAULT '',
     cusfaxno        VARCHAR(25)  NOT NULL DEFAULT '',
-    cusemail        VARCHAR(50)  NOT NULL DEFAULT '',
+    cusemail        VARCHAR(25)  NOT NULL DEFAULT '',
     custinno        VARCHAR(20)  NOT NULL DEFAULT '',   -- TIN
     cusvatno        VARCHAR(15)  NOT NULL DEFAULT '',   -- VAT reg no
     cussvatno       VARCHAR(25)  NOT NULL DEFAULT '',   -- SVAT reg no
     cusactyn        VARCHAR(1)   NOT NULL DEFAULT 'Y',  -- N = not active
+    -- Columns of the old table that the Customer screen does not use (kept so no old data is lost)
+    cusdistrict        VARCHAR(50)   NOT NULL DEFAULT '',
+    cuscity            VARCHAR(50)   NOT NULL DEFAULT '',
+    cusjoindate        DATE,
+    cusrecamt20221231  NUMERIC(12,2) NOT NULL DEFAULT 0,
+    cusbalamt20221231  NUMERIC(13,2) NOT NULL DEFAULT 0,
+    custem1            NUMERIC(14,2) NOT NULL DEFAULT 0,
+    custem2            NUMERIC(14,2) NOT NULL DEFAULT 0,
+    custem3            NUMERIC(14,2) NOT NULL DEFAULT 0,
     cusucdnew VARCHAR(30), cusentddt DATE, cusenttime TIME,   -- created by / date / time
     cusucdame VARCHAR(30), cusameddt DATE, cusametime TIME    -- updated by / date / time
   );
@@ -152,6 +161,17 @@ const TABLES = `
     exlcutoffddt DATE,
     UNIQUE (exlexhsno, exllno)
   );
+
+  -- If cusmast was created by an earlier version of this file, add the missing columns now
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusdistrict       VARCHAR(50)   NOT NULL DEFAULT '';
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cuscity           VARCHAR(50)   NOT NULL DEFAULT '';
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusjoindate       DATE;
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusrecamt20221231 NUMERIC(12,2) NOT NULL DEFAULT 0;
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusbalamt20221231 NUMERIC(13,2) NOT NULL DEFAULT 0;
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS custem1           NUMERIC(14,2) NOT NULL DEFAULT 0;
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS custem2           NUMERIC(14,2) NOT NULL DEFAULT 0;
+  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS custem3           NUMERIC(14,2) NOT NULL DEFAULT 0;
+  ALTER TABLE cusmast ALTER COLUMN cusemail TYPE VARCHAR(25);
 `;
 
 // Runs one INSERT for every row in the list. Rows that already exist are skipped.
@@ -165,9 +185,26 @@ async function main() {
 
   // ---- users
   const { date, time } = nowLocal();
+  // Use separate parameters: older databases can store entry time as VARCHAR
+  // and amendment time as TIME, so PostgreSQL must infer each type separately.
   await seed(
-    `INSERT INTO usdmast (usdusd, usdnam, usdpwd, usdemail, usdadmin, usdactflg, usducdnew, usdentddt, usdenttime, usducdame, usdameddt, usdametime)
-     VALUES ($1, $2, $3, $4, 'Y', 'Y', 'SETUP', $5, $6, 'SETUP', $7, $8)`,
+    // Supply required values explicitly because legacy tables may have no defaults.
+    `INSERT INTO usdmast (
+       usdusd, usdnam, usdpwd, usdemail, usdadmin, usdactflg,
+       usducdnew, usdentddt, usdenttime, usducdame, usdameddt, usdametime,
+       usdcomsno, usddesig, usddepsno, usdlocsno, usduno,
+       usdbockpodgrnyn, usdbrcsalyn, usdlacsalyn, usdprnsalyn, usdeggsalyn,
+       usdccnsalyn, usdpgfsalyn, usdcafsalyn, usdmaisalyn, usdhegsalyn, usdhassalyn,
+       usdrepyn, usdstkrolyn, usdatfauthyn, usdsohpvalyn,
+       usdsalstkcatsnos, usdprintername, usdatfliamt, usdatfnosetday
+     ) VALUES (
+       $1, $2, $3, $4, 'Y', 'Y', 'SETUP', $5, $6, 'SETUP', $7, $8,
+       0, '', 0, 0, '',
+       '', '', '', '', '',
+       '', '', '', '', '', '',
+       '', '', '', '',
+       '', '', 0, 0
+     )`,
     [
       ['2000', '2000', bcrypt.hashSync('2000 rbf', 10), 'rumeshdezoysa@gmail.com', date, time, date, time],
       ['ADMIN', 'ADMIN', bcrypt.hashSync('0777289242', 10), '', date, time, date, time],
@@ -187,7 +224,26 @@ async function main() {
   await seed('INSERT INTO expmast (expexp, expdays) VALUES ($1, $2)', [
     ['1 WEEK', 7], ['2 WEEKS', 14], ['1 MONTH', 30], ['2 MONTHS', 60], ['3 MONTHS', 90], ['6 MONTHS', 180],
   ]);
-  await seed('INSERT INTO g_genmast (genctl, gensub, gendes) VALUES ($1, $2, $3)', [
+  // Legacy account tables have extra required columns without database defaults.
+  // Include those columns only when present, keeping fresh databases compatible.
+  const legacyAccountValues = {
+    genctlsub: "$1::varchar || $2::varchar",
+    gendebint: "''", gencrdint: "''", gendes1: "''",
+    gencomsno: '0', genlocsno: '0', gencursno: '0', genjobsno: '0',
+    genempsno: '0', gengrpsno: '0', genectsno: '0',
+    gendepyn: "''", genempyn: "''", gencusyn: "''", genictyn: "''",
+    genadvyn: "''", genappyn: "''", gencamyn: "''", genvehyn: "''",
+    genlocyn: "''", genrate: '0', genbnkprefix: "''", genoticrdacc: "''", gentemp: "''",
+  };
+  const { rows: accountColumns } = await pool.query(
+    `SELECT attname FROM pg_attribute
+     WHERE attrelid = 'g_genmast'::regclass AND attnum > 0 AND NOT attisdropped`
+  );
+  const extraAccountColumns = Object.keys(legacyAccountValues)
+    .filter((name) => accountColumns.some((column) => column.attname === name));
+  const accountColumnsSql = ['genctl', 'gensub', 'gendes', ...extraAccountColumns].join(', ');
+  const accountValuesSql = ['$1', '$2', '$3', ...extraAccountColumns.map((name) => legacyAccountValues[name])].join(', ');
+  await seed(`INSERT INTO g_genmast (${accountColumnsSql}) VALUES (${accountValuesSql})`, [
     ['1100', '001', 'Medicine Stock'], ['1100', '002', 'Vaccine Stock'], ['1200', '001', 'Feed Stock'],
     ['1300', '001', 'Packing Material Stock'], ['5100', '001', 'Expired Stock Write-off'],
     ['5100', '002', 'Damaged Stock Write-off'], ['5200', '001', 'Stock Adjustment'],

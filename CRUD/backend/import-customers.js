@@ -18,14 +18,18 @@ async function main() {
          (cussno, cuscus, cusnam, cuscatsno, cuscredittmssno, cuscreditlimit, cusrepsno,
           cusadd, cusad1, cusad2, cusad3, cusad4, cusad5, custelno, cusfaxno, cusemail,
           custinno, cusvatno, cussvatno, cusactyn,
+          cusdistrict, cuscity, cusjoindate, cusrecamt20221231, cusbalamt20221231, custem1, custem2, custem3,
           cusucdnew, cusentddt, cusenttime, cusucdame, cusameddt, cusametime)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
+               $21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34)
        ON CONFLICT DO NOTHING`,
       [
         c.cussno, c.cuscus, c.cusnam, c.cuscatsno, c.cuscredittmssno, c.cuscreditlimit, c.cusrepsno,
         c.cusadd, c.cusad1, c.cusad2, c.cusad3, c.cusad4, c.cusad5, c.custelno, c.cusfaxno, c.cusemail,
         c.custinno, c.cusvatno, c.cussvatno,
         c.cusactyn || 'Y',                    // an empty flag in the old data means "active"
+        c.cusdistrict, c.cuscity, c.cusjoindate, c.cusrecamt20221231, c.cusbalamt20221231,
+        c.custem1, c.custem2, c.custem3,
         c.cusucdnew || null, c.cusentddt, c.cusenttime,
         c.cusucdame || null, c.cusameddt, c.cusametime,
       ]
