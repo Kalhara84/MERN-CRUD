@@ -8,171 +8,154 @@
 // =============================================================================
 const bcrypt = require('bcryptjs');
 const { pool, nowLocal } = require('./db');
+const { syncTables } = require('./sync-tables');
 
 // ------------------------------------------------------------------ tables
 // SERIAL = a number that goes up by itself (1, 2, 3 ...)
 // NOT NULL DEFAULT '' = cannot be empty (NULL), and '' is used when nothing is given
-const TABLES = `
-  -- Users (login + Users page)
-  CREATE TABLE IF NOT EXISTS usdmast (
-    usdsno            SERIAL PRIMARY KEY,
-    usdusd            VARCHAR(30)  NOT NULL,              -- user code (login name)
-    usdcomsno         INTEGER      NOT NULL DEFAULT 0,
-    usdnam            VARCHAR(50),
-    usdpwd            VARCHAR(100),                       -- password (saved as a hash)
-    usddesig          VARCHAR(25)  NOT NULL DEFAULT '',
-    usddepsno         INTEGER      NOT NULL DEFAULT 0,
-    usdlocsno         INTEGER      NOT NULL DEFAULT 0,
-    usduno            VARCHAR(4)   NOT NULL DEFAULT '',
-    usdemail          VARCHAR(40)  NOT NULL DEFAULT '',
-    usdadmin          VARCHAR(1)   NOT NULL DEFAULT '',   -- Y = admin
-    usdactflg         VARCHAR(1)   NOT NULL DEFAULT 'Y',  -- N = blocked
-    usdbockpodgrnyn   VARCHAR(1)   NOT NULL DEFAULT '',
-    usdbrcsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdlacsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdprnsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdeggsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdccnsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdpgfsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdcafsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdmaisalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdhegsalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdhassalyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdrepyn          VARCHAR(1)   NOT NULL DEFAULT '',
-    usdstkrolyn       VARCHAR(1)   NOT NULL DEFAULT '',
-    usdatfauthyn      VARCHAR(1)   NOT NULL DEFAULT '',
-    usdsohpvalyn      VARCHAR(1)   NOT NULL DEFAULT '',
-    usdsalstkcatsnos  VARCHAR(100) NOT NULL DEFAULT '',
-    usdprintername    VARCHAR(30)  NOT NULL DEFAULT '',
-    usdatfliamt       INTEGER      NOT NULL DEFAULT 0,
-    usdatfnosetday    INTEGER      NOT NULL DEFAULT 0,
-    usdpwdddt         DATE,                               -- password last changed
-    usducdnew         VARCHAR(30), usdentddt DATE, usdenttime TIME,   -- created by / date / time
-    usducdame         VARCHAR(30), usdameddt DATE, usdametime TIME,   -- updated by / date / time
-    UNIQUE (usdusd, usdcomsno)
-  );
-
-  -- Combo box tables
-  CREATE TABLE IF NOT EXISTS excmast (            -- Item Category
-    excsno SERIAL PRIMARY KEY,
-    excexc VARCHAR(40) NOT NULL UNIQUE,
-    excnam VARCHAR(40) NOT NULL DEFAULT ''
-  );
-  CREATE TABLE IF NOT EXISTS exlocmast (          -- Location
-    exlocsno SERIAL PRIMARY KEY,
-    exlocloc VARCHAR(40) NOT NULL UNIQUE,
-    exlocnam VARCHAR(40) NOT NULL DEFAULT ''
-  );
-  CREATE TABLE IF NOT EXISTS exsmast (            -- Service Cat
-    exssno SERIAL PRIMARY KEY,
-    exsexs VARCHAR(40) NOT NULL UNIQUE,
-    exsnam VARCHAR(40) NOT NULL DEFAULT ''
-  );
-  CREATE TABLE IF NOT EXISTS expmast (            -- Period
-    expsno SERIAL PRIMARY KEY,
-    expexp VARCHAR(40) NOT NULL UNIQUE,
-    expdays INTEGER
-  );
-  CREATE TABLE IF NOT EXISTS g_genmast (          -- Acc Code
-    gensno SERIAL PRIMARY KEY,
-    genctl VARCHAR(8) NOT NULL,
-    gensub VARCHAR(4) NOT NULL DEFAULT '',
-    gendes VARCHAR(60),
-    UNIQUE (genctl, gensub)
-  );
-
-  -- ---------------------------------------------------------------------------
-  -- Customers
-  -- ---------------------------------------------------------------------------
-
-  -- Small list table used by the Customer drop-downs.
-  -- sysrtp tells which list a row belongs to:  16 = Customer Category,  410 = Credit Terms
-  CREATE TABLE IF NOT EXISTS sysmast (
-    syssno SERIAL PRIMARY KEY,
-    sysrtp INTEGER     NOT NULL,
-    sysrno VARCHAR(25) NOT NULL,
-    sysdes VARCHAR(50) NOT NULL DEFAULT '',
-    UNIQUE (sysrtp, sysrno)
-  );
-
-  -- Sales reps (the "Rep" drop-down of a customer)
-  CREATE TABLE IF NOT EXISTS repmast (
-    repsno SERIAL PRIMARY KEY,
-    reprep VARCHAR(15) NOT NULL UNIQUE,                 -- rep code
-    repnam VARCHAR(50) NOT NULL DEFAULT ''              -- rep name
-  );
-
-  -- Customers
-  CREATE TABLE IF NOT EXISTS cusmast (
-    cussno          SERIAL PRIMARY KEY,
-    cuscus          VARCHAR(20)  NOT NULL UNIQUE,       -- customer code
-    cusnam          VARCHAR(100) NOT NULL,              -- customer name
-    cuscatsno       INTEGER      NOT NULL DEFAULT 0,    -- Category id   (sysmast, sysrtp = 16)
-    cuscredittmssno INTEGER      NOT NULL DEFAULT 0,    -- Credit Terms id (sysmast, sysrtp = 410)
-    cuscreditlimit  NUMERIC(12,0) NOT NULL DEFAULT 0,   -- Credit Limit
-    cusrepsno       INTEGER      NOT NULL DEFAULT 0,    -- Rep id        (repmast)
-    cusadd          VARCHAR(200) NOT NULL DEFAULT '',   -- full address
-    cusad1          VARCHAR(40)  NOT NULL DEFAULT '',
-    cusad2          VARCHAR(40)  NOT NULL DEFAULT '',
-    cusad3          VARCHAR(40)  NOT NULL DEFAULT '',
-    cusad4          VARCHAR(40)  NOT NULL DEFAULT '',
-    cusad5          VARCHAR(40)  NOT NULL DEFAULT '',
-    custelno        VARCHAR(25)  NOT NULL DEFAULT '',
-    cusfaxno        VARCHAR(25)  NOT NULL DEFAULT '',
-    cusemail        VARCHAR(25)  NOT NULL DEFAULT '',
-    custinno        VARCHAR(20)  NOT NULL DEFAULT '',   -- TIN
-    cusvatno        VARCHAR(15)  NOT NULL DEFAULT '',   -- VAT reg no
-    cussvatno       VARCHAR(25)  NOT NULL DEFAULT '',   -- SVAT reg no
-    cusactyn        VARCHAR(1)   NOT NULL DEFAULT 'Y',  -- N = not active
-    -- Columns of the old table that the Customer screen does not use (kept so no old data is lost)
-    cusdistrict        VARCHAR(50)   NOT NULL DEFAULT '',
-    cuscity            VARCHAR(50)   NOT NULL DEFAULT '',
-    cusjoindate        DATE,
-    cusrecamt20221231  NUMERIC(12,2) NOT NULL DEFAULT 0,
-    cusbalamt20221231  NUMERIC(13,2) NOT NULL DEFAULT 0,
-    custem1            NUMERIC(14,2) NOT NULL DEFAULT 0,
-    custem2            NUMERIC(14,2) NOT NULL DEFAULT 0,
-    custem3            NUMERIC(14,2) NOT NULL DEFAULT 0,
-    cusucdnew VARCHAR(30), cusentddt DATE, cusenttime TIME,   -- created by / date / time
-    cusucdame VARCHAR(30), cusameddt DATE, cusametime TIME    -- updated by / date / time
-  );
-
-  -- Expire entry: header
-  CREATE TABLE IF NOT EXISTS exhmast (
-    exhsno      SERIAL PRIMARY KEY,
-    exhdno      VARCHAR(30) NOT NULL UNIQUE,          -- entry code
-    exhexcsno   INTEGER     NOT NULL,                 -- Item Category id
-    exhexlocsno INTEGER     NOT NULL,                 -- Location id
-    exhddt      DATE        NOT NULL,
-    exhdes      VARCHAR(50) NOT NULL,
-    exhucdnew   VARCHAR(30), exhentddt DATE, exhenttime TIME,   -- created by / date / time
-    exhucdame   VARCHAR(30), exhameddt DATE, exhametime TIME    -- updated by / date / time
-  );
-
-  -- Expire entry: lines  (ON DELETE CASCADE = when the header is deleted, its lines go too)
-  CREATE TABLE IF NOT EXISTS exlmast (
-    exlsno       SERIAL PRIMARY KEY,
-    exlexhsno    INTEGER NOT NULL REFERENCES exhmast (exhsno) ON DELETE CASCADE,
-    exllno       INTEGER NOT NULL,                    -- line number 1, 2, 3 ...
-    exlexssno    INTEGER NOT NULL,                    -- Service Cat id
-    exlexpsno    INTEGER NOT NULL,                    -- Period id
-    exlgensno    INTEGER NOT NULL,                    -- Acc Code id
-    exlcomplddt  DATE,
-    exlcutoffddt DATE,
-    UNIQUE (exlexhsno, exllno)
-  );
-
-  -- If cusmast was created by an earlier version of this file, add the missing columns now
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusdistrict       VARCHAR(50)   NOT NULL DEFAULT '';
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cuscity           VARCHAR(50)   NOT NULL DEFAULT '';
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusjoindate       DATE;
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusrecamt20221231 NUMERIC(12,2) NOT NULL DEFAULT 0;
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS cusbalamt20221231 NUMERIC(13,2) NOT NULL DEFAULT 0;
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS custem1           NUMERIC(14,2) NOT NULL DEFAULT 0;
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS custem2           NUMERIC(14,2) NOT NULL DEFAULT 0;
-  ALTER TABLE cusmast ADD COLUMN IF NOT EXISTS custem3           NUMERIC(14,2) NOT NULL DEFAULT 0;
-  ALTER TABLE cusmast ALTER COLUMN cusemail TYPE VARCHAR(25);
-`;
+const TABLES = {
+  usdmast: [
+    "usdsno SERIAL PRIMARY KEY",
+    "usdusd VARCHAR(30) NOT NULL",
+    "usdcomsno INTEGER NOT NULL DEFAULT 0",
+    "usdnam VARCHAR(50)",
+    "usdpwd VARCHAR(100)",
+    "usddesig VARCHAR(25) NOT NULL DEFAULT ''",
+    "usddepsno INTEGER NOT NULL DEFAULT 0",
+    "usdlocsno INTEGER NOT NULL DEFAULT 0",
+    "usduno VARCHAR(4) NOT NULL DEFAULT ''",
+    "usdemail VARCHAR(40) NOT NULL DEFAULT ''",
+    "usdadmin VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdactflg VARCHAR(1) NOT NULL DEFAULT 'Y'",
+    "usdbockpodgrnyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdbrcsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdlacsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdprnsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdeggsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdccnsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdpgfsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdcafsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdmaisalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdhegsalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdhassalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdrepyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdstkrolyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdatfauthyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdsohpvalyn VARCHAR(1) NOT NULL DEFAULT ''",
+    "usdsalstkcatsnos VARCHAR(100) NOT NULL DEFAULT ''",
+    "usdprintername VARCHAR(30) NOT NULL DEFAULT ''",
+    "usdatfliamt INTEGER NOT NULL DEFAULT 0",
+    "usdatfnosetday INTEGER NOT NULL DEFAULT 0",
+    "usdpwdddt DATE",
+    "usducdnew VARCHAR(30)",
+    "usdentddt DATE",
+    "usdenttime TIME",
+    "usducdame VARCHAR(30)",
+    "usdameddt DATE",
+    "usdametime TIME",
+    "UNIQUE (usdusd, usdcomsno)",
+  ],
+  excmast: [
+    "excsno SERIAL PRIMARY KEY",
+    "excexc VARCHAR(40) NOT NULL UNIQUE",
+    "excnam VARCHAR(40) NOT NULL DEFAULT ''",
+  ],
+  exlocmast: [
+    "exlocsno SERIAL PRIMARY KEY",
+    "exlocloc VARCHAR(40) NOT NULL UNIQUE",
+    "exlocnam VARCHAR(40) NOT NULL DEFAULT ''",
+  ],
+  exsmast: [
+    "exssno SERIAL PRIMARY KEY",
+    "exsexs VARCHAR(40) NOT NULL UNIQUE",
+    "exsnam VARCHAR(40) NOT NULL DEFAULT ''",
+  ],
+  expmast: [
+    "expsno SERIAL PRIMARY KEY",
+    "expexp VARCHAR(40) NOT NULL UNIQUE",
+    "expdays INTEGER",
+  ],
+  g_genmast: [
+    "gensno SERIAL PRIMARY KEY",
+    "genctl VARCHAR(8) NOT NULL",
+    "gensub VARCHAR(4) NOT NULL DEFAULT ''",
+    "gendes VARCHAR(60)",
+    "UNIQUE (genctl, gensub)",
+  ],
+  sysmast: [
+    "syssno SERIAL PRIMARY KEY",
+    "sysrtp INTEGER NOT NULL",
+    "sysrno VARCHAR(25) NOT NULL",
+    "sysdes VARCHAR(50) NOT NULL DEFAULT ''",
+    "UNIQUE (sysrtp, sysrno)",
+  ],
+  repmast: [
+    "repsno SERIAL PRIMARY KEY",
+    "reprep VARCHAR(15) NOT NULL UNIQUE",
+    "repnam VARCHAR(50) NOT NULL DEFAULT ''",
+  ],
+  cusmast: [
+    "cussno SERIAL PRIMARY KEY",
+    "cuscus VARCHAR(20) NOT NULL UNIQUE",
+    "cusnam VARCHAR(100) NOT NULL",
+    "cuscatsno INTEGER NOT NULL DEFAULT 0",
+    "cuscredittmssno INTEGER NOT NULL DEFAULT 0",
+    "cuscreditlimit NUMERIC(12,0) NOT NULL DEFAULT 0",
+    "cusrepsno INTEGER NOT NULL DEFAULT 0",
+    "cusadd VARCHAR(200) NOT NULL DEFAULT ''",
+    "cusad1 VARCHAR(40) NOT NULL DEFAULT ''",
+    "cusad2 VARCHAR(40) NOT NULL DEFAULT ''",
+    "cusad3 VARCHAR(40) NOT NULL DEFAULT ''",
+    "cusad4 VARCHAR(40) NOT NULL DEFAULT ''",
+    "cusad5 VARCHAR(40) NOT NULL DEFAULT ''",
+    "custelno VARCHAR(25) NOT NULL DEFAULT ''",
+    "cusfaxno VARCHAR(25) NOT NULL DEFAULT ''",
+    "cusemail VARCHAR(25) NOT NULL DEFAULT ''",
+    "custinno VARCHAR(20) NOT NULL DEFAULT ''",
+    "cusvatno VARCHAR(15) NOT NULL DEFAULT ''",
+    "cussvatno VARCHAR(25) NOT NULL DEFAULT ''",
+    "cusactyn VARCHAR(1) NOT NULL DEFAULT 'Y'",
+    "cusdistrict VARCHAR(50) NOT NULL DEFAULT ''",
+    "cuscity VARCHAR(50) NOT NULL DEFAULT ''",
+    "cusjoindate DATE",
+    "cusrecamt20221231 NUMERIC(12,2) NOT NULL DEFAULT 0",
+    "cusbalamt20221231 NUMERIC(13,2) NOT NULL DEFAULT 0",
+    "custem1 NUMERIC(14,2) NOT NULL DEFAULT 0",
+    "custem2 NUMERIC(14,2) NOT NULL DEFAULT 0",
+    "custem3 NUMERIC(14,2) NOT NULL DEFAULT 0",
+    "cusucdnew VARCHAR(30)",
+    "cusentddt DATE",
+    "cusenttime TIME",
+    "cusucdame VARCHAR(30)",
+    "cusameddt DATE",
+    "cusametime TIME",
+  ],
+  exhmast: [
+    "exhsno SERIAL PRIMARY KEY",
+    "exhdno VARCHAR(30) NOT NULL UNIQUE",
+    "exhexcsno INTEGER NOT NULL",
+    "exhexlocsno INTEGER NOT NULL",
+    "exhddt DATE NOT NULL",
+    "exhdes VARCHAR(50) NOT NULL",
+    "exhucdnew VARCHAR(30)",
+    "exhentddt DATE",
+    "exhenttime TIME",
+    "exhucdame VARCHAR(30)",
+    "exhameddt DATE",
+    "exhametime TIME",
+  ],
+  exlmast: [
+    "exlsno SERIAL PRIMARY KEY",
+    "exlexhsno INTEGER NOT NULL REFERENCES exhmast (exhsno) ON DELETE CASCADE",
+    "exllno INTEGER NOT NULL",
+    "exlexssno INTEGER NOT NULL",
+    "exlexpsno INTEGER NOT NULL",
+    "exlgensno INTEGER NOT NULL",
+    "exlcomplddt DATE",
+    "exlcutoffddt DATE",
+    "UNIQUE (exlexhsno, exllno)",
+  ],
+};
 
 // Runs one INSERT for every row in the list. Rows that already exist are skipped.
 async function seed(sql, rows) {
@@ -180,8 +163,8 @@ async function seed(sql, rows) {
 }
 
 async function main() {
-  await pool.query(TABLES);
-  console.log('Tables ready.');
+  await syncTables(pool, TABLES);
+  console.log('Tables created / updated.');
 
   // ---- users
   const { date, time } = nowLocal();
