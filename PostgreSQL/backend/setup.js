@@ -64,12 +64,19 @@ async function migrate() {
 }
 async function seed() {
   for (const row of require('./seed/lookups.json')) {
-    await pool.execute('INSERT INTO sysmast (syssno, sysrtp, sysrno, sysdes) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING', row);
+    await pool.execute(
+      'INSERT INTO sysmast (syssno, sysrtp, sysrno, sysdes) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING', 
+      row
+    );
   }
-  const code = process.env.ADMIN_CODE || 'ADMIN';
-  const [rows] = await pool.execute('SELECT usdsno FROM usdmast WHERE lower(usdusd) = lower(?) AND usdcomsno = 0', [code]);
+  const code = process.env.ADMIN_CODE ;
+  const [rows] = await pool.execute(
+    'SELECT usdsno FROM usdmast WHERE lower(usdusd) = lower(?) AND usdcomsno = 0', 
+    [code]
+  );
+
   if (!rows.length) {
-    const password = process.env.ADMIN_PASSWORD || '1234';
+    const password = process.env.ADMIN_PASSWORD;
     const {
       date,
       time
@@ -92,27 +99,38 @@ async function importCustomers() {
   const customers = require('./seed/customers.json');
   let added = 0;
   for (const customer of customers) {
-    const [rows] = await pool.execute('SELECT cussno FROM cusmast WHERE lower(cuscus) = lower(?)', [customer.cuscus]);
+    
+    const [rows] = await pool.execute(
+      'SELECT cussno FROM cusmast WHERE lower(cuscus) = lower(?)', 
+      [customer.cuscus]
+    );
+
     if (rows.length) {
       continue;
     }
+
     const values = {
       ...customer
     };
+
     delete values.cussno;
     values.cusactyn = values.cusactyn || 'Y';
+    
     for (const key of Object.keys(values)) {
       if (/ddt$|date$|time$/.test(key) && !values[key]) {
         values[key] = null;
       }
     }
+
     await insertRow('cusmast', values);
     added++;
+
   }
   console.log(`Imported ${added}; skipped ${customers.length - added} existing customer codes.`);
 }
 async function main() {
   const command = process.argv[2] || 'setup';
+ 
   if (command === 'setup') {
     await migrate();
     await seed();
@@ -126,10 +144,16 @@ async function main() {
   } else {
     throw new Error('Use: node setup.js [setup|migrate|seed|import]');
   }
+
 }
+
 main().catch(error => {
-  console.error(error.message);
+  console.error(
+    error.message
+  );
+
   process.exitCode = 1;
+  
 }).finally(() => {
   return pool.end();
 });

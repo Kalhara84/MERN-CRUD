@@ -2,24 +2,35 @@
 const {
   pool
 } = require('./db');
+
 const express = require('express');
 const cors = require('cors');
 const app = express();
+
+
 app.use(cors({
   origin: process.env.FRONTEND_URL
 }));
+
+
 app.use(express.json({
   limit: '100kb'
 }));
+
+
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/customers', require('./routes/customersRoutes'));
 app.use('/api/users', require('./routes/usersRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+
+
 app.use((req, res) => {
   return res.status(404).json({
     message: 'Not found'
   });
 });
+
+
 app.use((error, req, res, next) => {
   console.error(error.message);
   if (error.code === '23505') {
@@ -34,7 +45,7 @@ app.use((error, req, res, next) => {
 
 // Importing this file for a check does not start a second server.
 if (require.main === module) {
-  const port = process.env.PORT || 5000;
+  const port = process.env.PORT;
   pool.execute('SELECT 1').then(() => {
     app.listen(port, () => {
       return console.log('SRTBF API on http://localhost:' + port + ' (PostgreSQL connected)');

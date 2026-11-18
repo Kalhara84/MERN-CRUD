@@ -20,10 +20,12 @@ const config = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
 };
+
 const pool = new Pool({
   ...config,
   max: 10
 });
+
 pool.on('error', error => {
   return console.error('PostgreSQL error:', error.message);
 });
@@ -37,6 +39,7 @@ pool.execute = async (sql, values = []) => {
   }), values);
   return [result.rows, result];
 };
+
 function nowLocal() {
   const [date, time] = new Date().toLocaleString('sv-SE', {
     timeZone: 'Asia/Colombo'

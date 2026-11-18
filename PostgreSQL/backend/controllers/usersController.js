@@ -18,11 +18,44 @@ const {
 } = require('../auth');
 
 // The columns that come from the form, in 3 groups
-const TEXT_FIELDS = ['usdusd', 'usdnam', 'usdemail', 'usddesig', 'usduno', 'usdprintername', 'usdsalstkcatsnos'];
-const NUMBER_FIELDS = ['usdcomsno', 'usddepsno', 'usdlocsno', 'usdatfliamt', 'usdatfnosetday'];
+const TEXT_FIELDS = [
+  'usdusd', 
+  'usdnam', 
+  'usdemail', 
+  'usddesig', 
+  'usduno', 
+  'usdprintername', 
+  'usdsalstkcatsnos'
+];
+
+
+const NUMBER_FIELDS = [
+  'usdcomsno', 
+  'usddepsno', 
+  'usdlocsno', 
+  'usdatfliamt', 
+  'usdatfnosetday'
+];
 
 // Yes/No columns: the database holds 'Y' or '', the form shows a check box
-const YN_FIELDS = ['usdadmin', 'usdbockpodgrnyn', 'usdbrcsalyn', 'usdlacsalyn', 'usdprnsalyn', 'usdeggsalyn', 'usdccnsalyn', 'usdpgfsalyn', 'usdcafsalyn', 'usdmaisalyn', 'usdhegsalyn', 'usdhassalyn', 'usdrepyn', 'usdstkrolyn', 'usdatfauthyn', 'usdsohpvalyn'];
+const YN_FIELDS = [
+  'usdadmin', 
+  'usdbockpodgrnyn', 
+  'usdbrcsalyn', 
+  'usdlacsalyn', 
+  'usdprnsalyn', 
+  'usdeggsalyn', 
+  'usdccnsalyn', 
+  'usdpgfsalyn', 
+  'usdcafsalyn', 
+  'usdmaisalyn', 
+  'usdhegsalyn', 
+  'usdhassalyn', 
+  'usdrepyn', 
+  'usdstkrolyn', 
+  'usdatfauthyn', 
+  'usdsohpvalyn'
+];
 
 // Maximum length of each text box
 const MAX = {
@@ -40,6 +73,7 @@ const MAX = {
 function readForm(body, isNew) {
   const errors = {};
   const values = {};
+
   TEXT_FIELDS.forEach(field => {
     const text = String(body[field] ?? '').trim();
     if (text.length > MAX[field]) {
@@ -47,9 +81,11 @@ function readForm(body, isNew) {
     }
     values[field] = text;
   });
+
   if (!values.usdusd) {
     errors.usdusd = 'User code is required';
   }
+
   NUMBER_FIELDS.forEach(field => {
     const text = String(body[field] ?? '').trim();
     if (!/^-?\d+$/.test(text)) {
@@ -57,9 +93,11 @@ function readForm(body, isNew) {
     }
     values[field] = parseInt(text, 10);
   });
+
   YN_FIELDS.forEach(field => {
     values[field] = body[field] ? 'Y' : '';
   });
+
   values.usdactflg = body.usdactflg ? 'Y' : 'N'; // ticked = active, not ticked = blocked
 
   // Password: needed for a new user, optional when editing
@@ -67,9 +105,11 @@ function readForm(body, isNew) {
   if (isNew && !password) {
     errors.new_password = 'Password is required';
   }
+
   if (password.length > 30) {
     errors.new_password = 'Password must be 30 characters or less';
   }
+
   return {
     errors,
     values,
@@ -168,24 +208,29 @@ async function update(req, res) {
     values,
     password
   } = readForm(req.body, false);
+
   if (user.usdsno === req.user.usdsno && (!values.usdadmin || values.usdactflg === 'N')) {
     return res.status(400).json({
       message: 'You cannot remove your own administrator access or block your account.'
     });
   }
+
   if (Object.keys(errors).length === 0 && (await codeExists(values.usdusd, values.usdcomsno, user.usdsno))) {
     errors.usdusd = 'This User code already exists';
   }
+
   if (Object.keys(errors).length > 0) {
     return res.status(422).json({
       message: 'Please correct the errors',
       errors
     });
   }
+
   const {
     date,
     time
   } = nowLocal();
+
   const changes = {
     ...values,
     usducdame: req.user.usdusd.slice(0, 30),
@@ -198,6 +243,7 @@ async function update(req, res) {
     changes.usdpwd = bcrypt.hashSync(password, 10);
     changes.usdpwdddt = date;
   }
+  
   await model.update(user.usdsno, changes);
   res.json({
     message: `User '${values.usdusd}' updated.`
