@@ -1,6 +1,10 @@
 // MySQL connection and the three small helpers shared by the API files.
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+require('dotenv').config({ 
+  path: path.join(__dirname, '.env') 
+});
+
 const config = {
   host: process.env.DB_HOST || '127.0.0.1',
   port: Number(process.env.DB_PORT || 3306),

@@ -19,10 +19,20 @@ const CREDIT_TERMS_TYPE = 410;
 
 // Text boxes that come from the form, and the longest text each one can hold
 const MAX = {
-  cuscus: 20, cusnam: 100, cusadd: 200,
-  cusad1: 40, cusad2: 40, cusad3: 40, cusad4: 40, cusad5: 40,
-  custelno: 25, cusfaxno: 25, cusemail: 25,
-  custinno: 20, cusvatno: 15, cussvatno: 25,
+  cuscus: 20, 
+  cusnam: 100, 
+  cusadd: 200,
+  cusad1: 40, 
+  cusad2: 40, 
+  cusad3: 40, 
+  cusad4: 40, 
+  cusad5: 40,
+  custelno: 25, 
+  cusfaxno: 25, 
+  cusemail: 25,
+  custinno: 20,
+  cusvatno: 15, 
+  cussvatno: 25,
 };
 const TEXT_FIELDS = Object.keys(MAX).filter((field) => field !== 'cuscus');   // the code is handled on its own
 
@@ -34,9 +44,20 @@ async function getLookups() {
   const [rep] = await model.representatives();
 
   return {
-    cat: cat.map((r) => ({ id: r.syssno, label: r.sysdes })),                    // Category
-    credit: credit.map((r) => ({ id: r.syssno, label: r.sysdes })),              // Credit Terms
-    rep: rep.map((r) => ({ id: r.repsno, label: r.repnam || r.reprep })),        // Rep
+    cat: cat.map((r) => ({ 
+      id: r.syssno, 
+      label: r.sysdes 
+    })),        
+                // Category
+    credit: credit.map((r) => ({
+       id: r.syssno, 
+       label: r.sysdes 
+      })), 
+                   // Credit Terms
+    rep: rep.map((r) => ({ 
+      id: r.repsno, 
+      label: r.repnam || r.reprep 
+    })),        // Rep
   };
 }
 

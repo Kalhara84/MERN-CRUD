@@ -12,6 +12,12 @@ async function summary(req, res) {
     const [rows] = await model.users();
     users = rows[0];
   }
-  res.json({ customers: customers[0], users, categories, months, recent });
+  res.json({ 
+    customers: customers[0], 
+    users, 
+    categories, 
+    months, 
+    recent 
+  });
 }
 module.exports = { summary };

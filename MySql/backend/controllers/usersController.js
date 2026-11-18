@@ -14,13 +14,43 @@ const { nowLocal } = require('../db');
 const { safeUser } = require('../auth');
 
 // The columns that come from the form, in 3 groups
-const TEXT_FIELDS = ['usdusd', 'usdnam', 'usdemail', 'usddesig', 'usduno', 'usdprintername', 'usdsalstkcatsnos'];
-const NUMBER_FIELDS = ['usdcomsno', 'usddepsno', 'usdlocsno', 'usdatfliamt', 'usdatfnosetday'];
+const TEXT_FIELDS = [
+  'usdusd', 
+  'usdnam', 
+  'usdemail', 
+  'usddesig', 
+  'usduno', 
+  'usdprintername', 
+  'usdsalstkcatsnos'
+];
+
+const NUMBER_FIELDS = [
+  'usdcomsno', 
+  'usddepsno', 
+  'usdlocsno', 
+  'usdatfliamt', 
+  'usdatfnosetday'
+];
+
+
 // Yes/No columns: the database holds 'Y' or '', the form shows a check box
 const YN_FIELDS = [
-  'usdadmin', 'usdbockpodgrnyn', 'usdbrcsalyn', 'usdlacsalyn', 'usdprnsalyn', 'usdeggsalyn',
-  'usdccnsalyn', 'usdpgfsalyn', 'usdcafsalyn', 'usdmaisalyn', 'usdhegsalyn', 'usdhassalyn',
-  'usdrepyn', 'usdstkrolyn', 'usdatfauthyn', 'usdsohpvalyn',
+  'usdadmin', 
+  'usdbockpodgrnyn', 
+  'usdbrcsalyn', 
+  'usdlacsalyn', 
+  'usdprnsalyn', 
+  'usdeggsalyn',
+  'usdccnsalyn', 
+  'usdpgfsalyn', 
+  'usdcafsalyn', 
+  'usdmaisalyn', 
+  'usdhegsalyn', 
+  'usdhassalyn',
+  'usdrepyn', 
+  'usdstkrolyn', 
+  'usdatfauthyn', 
+  'usdsohpvalyn',
 ];
 
 // Maximum length of each text box

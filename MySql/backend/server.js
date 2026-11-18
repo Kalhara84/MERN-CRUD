@@ -9,12 +9,26 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/customers', require('./routes/customersRoutes'));
 app.use('/api/users', require('./routes/usersRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
-app.use((req, res) => res.status(404).json({ message: 'Not found' }));
+
+
+app.use((req, res) => res.status(404).json({
+   message: 'Not found' 
+  }));
+
+
 app.use((error, req, res, next) => {
   console.error(error.message);
-  if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ message: 'This code already exists. Please choose another code.' });
-  res.status(error.status || 500).json({ message: error.status === 400 ? 'Invalid request body' : 'Unable to complete the request. Please try again.' });
+  if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ 
+    message: 'This code already exists. Please choose another code.' 
+  });
+
+  res.status(error.status || 500).json({
+     message: error.status === 400 ? 'Invalid request body' : 'Unable to complete the request. Please try again.' 
+    });
+    
 });
+
+
 // Importing this file for a check does not start a second server.
 if (require.main === module) {
   const port = process.env.PORT || 5000;
