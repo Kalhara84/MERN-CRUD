@@ -73,13 +73,16 @@ npm run dev
 Open http://localhost:5174. The API runs on port 5000.
 On Windows, use `npm.cmd` if PowerShell blocks `npm`.
 
-Login with the `ADMIN_CODE` and `ADMIN_PASSWORD` values in `backend/.env`.
-For a fresh installation, copy `.env.example` to `.env` and set your own credentials first.
+For a fresh database, setup creates login `ADMIN` with password `1234`.
+These initial values can be set using `ADMIN_CODE` and `ADMIN_PASSWORD` in `backend/.env`.
+Existing user passwords and customer records are preserved when setup is run again.
+For a fresh installation, copy `.env.example` to `.env` and set the MySQL connection details.
 
 ## Database commands
 
 Run inside `backend`:
 
+- `npm run db:setup`: create the database/tables, add the administrator and dropdown values, and import the bundled customers in one command.
 - `npm run db:migrate`: apply new SQL migrations.
 - `npm run db:seed`: add the initial administrator and dropdown values.
 - `npm run db:import-customers`: import the bundled customer records without duplicating existing codes.

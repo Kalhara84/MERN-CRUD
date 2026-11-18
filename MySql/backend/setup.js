@@ -59,13 +59,13 @@ async function seed() {
       'INSERT INTO sysmast (syssno, sysrtp, sysrno, sysdes) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE syssno = syssno', row
     );
   }
-  const [rows] = await pool.execute('SELECT usdsno FROM usdmast LIMIT 1');
+  const code = process.env.ADMIN_CODE || 'ADMIN';
+  const [rows] = await pool.execute('SELECT usdsno FROM usdmast WHERE usdusd = ? AND usdcomsno = 0', [code]);
   if (!rows.length) {
-    const password = process.env.ADMIN_PASSWORD;
-    if (!password || password.length < 8) throw new Error('Set ADMIN_PASSWORD (at least 8 characters) in .env to create the first administrator');
+    const password = process.env.ADMIN_PASSWORD || '1234';
     const { date, time } = nowLocal();
     await insertRow('usdmast', { 
-      usdusd: process.env.ADMIN_CODE, 
+      usdusd: code, 
       usdnam: 'Farm administrator', 
       usdpwd: await bcrypt.hash(password, 10), 
       usdadmin: 'Y', 
@@ -107,7 +107,11 @@ async function importCustomers() {
 
 async function main() {
   const command = process.argv[2] || 'setup';
-  if (command === 'setup') { await migrate(); await seed(); }
+  if (command === 'setup') {
+    await migrate();
+    await seed();
+    await importCustomers();
+  }
   else if (command === 'migrate') await migrate();
   else if (command === 'seed') await seed();
   else if (command === 'import') await importCustomers();
