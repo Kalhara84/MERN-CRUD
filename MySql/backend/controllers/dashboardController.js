@@ -1,7 +1,5 @@
 // Dashboard totals come directly from the customers and users tables.
 const model = require('../models/dashboardModel');
-
-
 async function summary(req, res) {
   const [customers] = await model.customers();
   const [categories] = await model.categories();
@@ -12,12 +10,14 @@ async function summary(req, res) {
     const [rows] = await model.users();
     users = rows[0];
   }
-  res.json({ 
-    customers: customers[0], 
-    users, 
-    categories, 
-    months, 
-    recent 
+  res.json({
+    customers: customers[0],
+    users,
+    categories,
+    months,
+    recent
   });
 }
-module.exports = { summary };
+module.exports = {
+  summary
+};
