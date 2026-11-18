@@ -1,3 +1,4 @@
+// Create the initial administrator and dropdown values.
 const bcrypt = require('bcryptjs');
 const { pool, nowLocal, insertRow } = require('../models/database');
 async function seed() {

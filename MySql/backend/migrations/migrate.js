@@ -1,3 +1,4 @@
+// Run with npm run db:migrate to create or update the MySQL tables.
 const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');

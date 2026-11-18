@@ -2,7 +2,9 @@
 const { pool } = require('./database');
 const CATEGORY_TYPE = 16;
 const CREDIT_TERMS_TYPE = 410;
-exports.categories = (params = []) => pool.query('SELECT syssno, sysdes FROM sysmast WHERE sysrtp = ? ORDER BY sysrno', params);
+exports.categories = (params = []) => pool.query(
+    'SELECT syssno, sysdes FROM sysmast WHERE sysrtp = ? ORDER BY sysrno', params
+);
 
 exports.creditTerms = (params = []) => pool.query('SELECT syssno, sysdes FROM sysmast WHERE sysrtp = ? ORDER BY sysrno', params);
 

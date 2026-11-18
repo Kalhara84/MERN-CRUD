@@ -1,4 +1,4 @@
-const customers = require('../seed/customers.json');
+const customers = require('./customers.json');
 const { pool, insertRow } = require('../models/database');
 async function run() {
   let added = 0;
