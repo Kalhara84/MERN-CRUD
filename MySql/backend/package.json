@@ -1,15 +1,15 @@
 {
   "name": "srtbf-backend",
   "version": "1.0.0",
-  "description": "SRTBF chicken farm - Express MVC and MySQL",
+  "description": "SRTBF chicken farm - simple Express and MySQL API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "db:setup": "npm run db:migrate && npm run db:seed",
-    "db:import-customers": "node seed/import-customers.js",
-    "db:migrate": "node migrations/migrate.js",
-    "db:seed": "node seed/seed.js"
+    "db:setup": "node setup.js",
+    "db:import-customers": "node setup.js import",
+    "db:migrate": "node setup.js migrate",
+    "db:seed": "node setup.js seed"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
