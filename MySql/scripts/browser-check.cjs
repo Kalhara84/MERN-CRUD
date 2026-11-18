@@ -63,12 +63,12 @@ async function main() {
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await visit('http://localhost:5174', 'Farm overview');
     await screenshot('dashboard-mobile');
-    assert.equal(await evaluate('document.documentElement.scrollWidth <= window.innerWidth'), true, 'Dashboard must fit mobile width');
+    assert.equal(await evaluate('document.documentElement.scrollWidth <= 390'), true, 'Dashboard must fit mobile width');
     await evaluate("document.querySelector('[aria-label=\"Toggle navigation\"]').click()");
     assert.equal(await evaluate("document.querySelector('[aria-label=\"Toggle navigation\"]').getAttribute('aria-expanded')"), 'true');
     await visit('http://localhost:5174/customers', 'Customer directory');
     await screenshot('customers-mobile');
-    assert.equal(await evaluate('document.documentElement.scrollWidth <= window.innerWidth'), true, 'Customers must fit mobile width');
+    assert.equal(await evaluate('document.documentElement.scrollWidth <= 390'), true, 'Customers must fit mobile width');
     assert.deepEqual(errors, []);
     console.log('PASS: browser login, images, dashboard, customer list/add, user list/add, mobile navigation and responsive widths.');
   } finally { await send('Browser.close').catch(() => {}); socket.close(); }

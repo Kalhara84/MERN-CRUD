@@ -6,6 +6,6 @@ exports.categories = () => pool.query(`SELECT COALESCE(s.sysdes, 'Uncategorized'
   FROM cusmast c LEFT JOIN sysmast s ON c.cuscatsno = s.syssno AND s.sysrtp = 16
   GROUP BY COALESCE(s.sysdes, 'Uncategorized') ORDER BY value DESC`);
 exports.months = () => pool.query(`SELECT DATE_FORMAT(cusentddt, '%Y-%m') month, COUNT(*) value
-  FROM cusmast WHERE cusentddt >= DATE_SUB(DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01'), INTERVAL 5 MONTH)
+  FROM cusmast WHERE cusentddt >= DATE_SUB(DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01'), INTERVAL 11 MONTH)
   AND cusentddt <= CURRENT_DATE() GROUP BY DATE_FORMAT(cusentddt, '%Y-%m') ORDER BY month`);
 exports.recent = () => pool.query('SELECT cussno, cuscus, cusnam, custelno, cusactyn FROM cusmast ORDER BY cusentddt DESC, cussno DESC LIMIT 5');
