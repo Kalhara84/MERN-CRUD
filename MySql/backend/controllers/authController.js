@@ -1,15 +1,9 @@
-
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const model = require('../models/authModel');
-const { safeUser } = require('../utils/user');
-
+const users = require('../models/usersModel');
+const { safeUser } = require('../auth');
 const SECRET = process.env.JWT_SECRET;
-if (!SECRET) throw new Error('Set JWT_SECRET in backend/.env');
 
-
-
-// POST /api/auth/login   body: { usdusd, usdpwd, remember }
 async function login(req, res) {
   const code = String(req.body.usdusd || '').trim();
   const password = String(req.body.usdpwd || '');
@@ -20,7 +14,7 @@ async function login(req, res) {
   }
 
   // Find the user (capital / small letters do not matter). Blocked users (usdactflg = 'N') are skipped.
-  const { rows } = await model.findByCode(code);
+  const [rows] = await users.findForLogin(code);
   const user = rows[0];
   if (!user) return res.status(401).json({ message: 'Invalid user code or password' });
 
@@ -35,4 +29,7 @@ async function login(req, res) {
 }
 
 
-module.exports = { login };
+function me(req, res) {
+  res.json({ user: req.user });
+}
+module.exports = { login, me };

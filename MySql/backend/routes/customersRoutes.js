@@ -1,10 +1,14 @@
 const router = require('express').Router();
-const controller = require('../controllers/customersController');
-router.get('/lookups', controller.get_lookups);
-router.get('/next-code', controller.get_next_code);
-router.get('/', controller.getAll);
-router.get('/:id', controller.getOne);
-router.post('/', controller.postAll);
-router.put('/:id', controller.putOne);
-router.delete('/:id', controller.deleteOne);
+const customers = require('../controllers/customersController');
+const { loginRequired } = require('../auth');
+
+router.use(loginRequired);
+router.get('/lookups', customers.lookups);
+router.get('/next-code', customers.nextCode);
+router.get('/', customers.list);
+router.get('/:id', customers.find);
+router.post('/', customers.create);
+router.put('/:id', customers.update);
+router.delete('/:id', customers.remove);
+
 module.exports = router;

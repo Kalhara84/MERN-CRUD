@@ -1,4 +1,3 @@
-const model = require('../models/usersModel');
 // =============================================================================
 // users.js - Users page: list, add, edit, delete   (admin only, see server.js)
 //
@@ -10,10 +9,9 @@ const model = require('../models/usersModel');
 // =============================================================================
 
 const bcrypt = require('bcryptjs');
-const { nowLocal, insertRow, updateRow } = require('../models/database');
-const { safeUser } = require('../utils/user');
-
-
+const model = require('../models/usersModel');
+const { nowLocal } = require('../db');
+const { safeUser } = require('../auth');
 
 // The columns that come from the form, in 3 groups
 const TEXT_FIELDS = ['usdusd', 'usdnam', 'usdemail', 'usddesig', 'usduno', 'usdprintername', 'usdsalstkcatsnos'];
@@ -60,32 +58,32 @@ function readForm(body, isNew) {
 
 // Is this user code already used in the same company? (capital / small letters ignored)
 async function codeExists(code, companyNo, exceptId) {
-  const { rows } = await model.codeExists([code, companyNo, exceptId]);
+  const [rows] = await model.codeExists([code, companyNo, exceptId]);
   return rows.length > 0;
 }
 
 // Finds one user by id. Returns undefined when there is no such user.
 async function findUser(id) {
   if (!/^\d+$/.test(id)) return undefined;
-  const { rows } = await model.find([id]);
+  const [rows] = await model.find([id]);
   return rows[0];
 }
 
 // GET /api/users
-exports.getAll = async (req, res) => {
-  const { rows } = await model.list();
+async function list(req, res) {
+  const [rows] = await model.list();
   res.json({ users: rows.map(safeUser) });
-};
+}
 
 // GET /api/users/:id
-exports.getOne = async (req, res) => {
+async function find(req, res) {
   const user = await findUser(req.params.id);
   if (!user) return res.status(404).json({ message: 'User not found' });
   res.json({ user: safeUser(user) });
-};
+}
 
 // POST /api/users
-exports.postAll = async (req, res) => {
+async function create(req, res) {
   const { errors, values, password } = readForm(req.body, true);
 
   // Check the duplicate code only when everything else is fine
@@ -99,7 +97,7 @@ exports.postAll = async (req, res) => {
   const { date, time } = nowLocal();
   const me = req.user.usdusd.slice(0, 30);   // who is saving (the logged-in user)
 
-  await insertRow('usdmast', {
+  await model.create({
     ...values,
     usdpwd: bcrypt.hashSync(password, 10),
     usdpwdddt: date,
@@ -110,10 +108,10 @@ exports.postAll = async (req, res) => {
   });
 
   res.status(201).json({ message: `User '${values.usdusd}' added.` });
-};
+}
 
 // PUT /api/users/:id
-exports.putOne = async (req, res) => {
+async function update(req, res) {
   const user = await findUser(req.params.id);
   if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -137,12 +135,12 @@ exports.putOne = async (req, res) => {
     changes.usdpwdddt = date;
   }
 
-  await updateRow('usdmast', 'usdsno', user.usdsno, changes);
+  await model.update(user.usdsno, changes);
   res.json({ message: `User '${values.usdusd}' updated.` });
-};
+}
 
 // DELETE /api/users/:id
-exports.deleteOne = async (req, res) => {
+async function remove(req, res) {
   const user = await findUser(req.params.id);
   if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -153,5 +151,6 @@ exports.deleteOne = async (req, res) => {
 
   await model.remove([user.usdsno]);
   res.json({ message: `User '${user.usdusd}' deleted.` });
-};
+}
 
+module.exports = { list, find, create, update, remove };

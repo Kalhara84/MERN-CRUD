@@ -1,21 +1,31 @@
 ﻿# SRTBF Chicken Farm
 
-React + Tailwind CSS frontend, Node.js + Express MVC backend, and MySQL.
+React + Tailwind CSS frontend, a simple Node.js + Express backend, and MySQL.
 
 ## Files
 
 ```text
 backend/
-  server.js          Start the Node.js server
-  app.js             Express API configuration
-  config/            MySQL connection settings
-  routes/            API URLs
-  controllers/       Request validation and responses
-  models/            Database queries
-  middleware/        Login and admin access
-  utils/             Shared helpers
-  migrations/        SQL migrations and migration runner
-  seed/              Initial admin, lookup values and customer import
+  server.js          Start Express and register the routes
+  db.js              MySQL connection and shared helpers
+  routes/            API URLs grouped by feature
+    authRoutes.js
+    customersRoutes.js
+    usersRoutes.js
+    dashboardRoutes.js
+  auth.js            Login checking and administrator access
+  controllers/       Validate requests and send responses
+    authController.js
+    customersController.js
+    usersController.js
+    dashboardController.js
+  models/            SQL queries for each feature
+    customersModel.js
+    usersModel.js
+    dashboardModel.js
+  setup.js           Migrations, initial administrator and data import
+  migrations/        SQL migration files
+  seed/              Customer and lookup JSON data
 frontend/
   src/
     App.jsx          React routes
@@ -27,6 +37,16 @@ frontend/
 ```
 
 ## Run
+
+The project uses a small MVC structure:
+
+- Model: SQL queries in `backend/models/`.
+- View: React pages in `frontend/src/pages/`.
+- Controller: request validation and responses in `backend/controllers/`.
+
+Follow one request: React page -> route -> controller -> model -> MySQL.
+Each feature has one route file, one controller and one model;
+there are no additional service or repository layers. Authentication uses the user model.
 
 Start MySQL and set the connection details in `backend/.env`.
 The current database uses port **3307** and stores its data in `.local-mysql/data`.

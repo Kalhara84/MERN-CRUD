@@ -1,4 +1,3 @@
-const model = require('../models/customersModel');
 // =============================================================================
 // customers.js - Customers page: list, add, edit, delete   (all logged-in users)
 //
@@ -11,9 +10,8 @@ const model = require('../models/customersModel');
 //   DELETE /api/customers/:id        delete a customer
 // =============================================================================
 
-const { nowLocal, insertRow, updateRow } = require('../models/database');
-
-
+const model = require('../models/customersModel');
+const { nowLocal } = require('../db');
 
 // sysmast keeps many small lists. This number tells which list we want.
 const CATEGORY_TYPE = 16;
@@ -31,54 +29,52 @@ const TEXT_FIELDS = Object.keys(MAX).filter((field) => field !== 'cuscus');   //
 // ------------------------------------------------------------ drop-down data
 // Every item is { id, label }
 async function getLookups() {
-  const [cat, credit, rep] = await Promise.all([
-    model.categories([CATEGORY_TYPE]),
-    model.creditTerms([CREDIT_TERMS_TYPE]),
-    model.representatives(),
-  ]);
+  const [cat] = await model.categories([CATEGORY_TYPE]);
+  const [credit] = await model.creditTerms([CREDIT_TERMS_TYPE]);
+  const [rep] = await model.representatives();
 
   return {
-    cat: cat.rows.map((r) => ({ id: r.syssno, label: r.sysdes })),                    // Category
-    credit: credit.rows.map((r) => ({ id: r.syssno, label: r.sysdes })),              // Credit Terms
-    rep: rep.rows.map((r) => ({ id: r.repsno, label: r.repnam || r.reprep })),        // Rep
+    cat: cat.map((r) => ({ id: r.syssno, label: r.sysdes })),                    // Category
+    credit: credit.map((r) => ({ id: r.syssno, label: r.sysdes })),              // Credit Terms
+    rep: rep.map((r) => ({ id: r.repsno, label: r.repnam || r.reprep })),        // Rep
   };
 }
 
 // GET /api/customers/lookups
-exports.get_lookups = async (req, res) => {
+async function lookups(req, res) {
   res.json(await getLookups());
-};
+}
 
 // ------------------------------------------------------------------ next code
 // The biggest numeric code + 1.  Codes that are not numbers (for example "ABC") are ignored.
 // GET /api/customers/next-code
-exports.get_next_code = async (req, res) => {
-  const { rows } = await model.nextCode();
+async function nextCode(req, res) {
+  const [rows] = await model.nextCode();
   res.json({ code: String(rows[0].next) });
-};
+}
 
 // --------------------------------------------------------------------- list
 // The list also brings the Category name and the Rep name, so the table can show them.
 // GET /api/customers
-exports.getAll = async (req, res) => {
-  const { rows } = await model.list();
+async function list(req, res) {
+  const [rows] = await model.list();
   res.json({ customers: rows });
-};
+}
 
 // ------------------------------------------------------------- one customer
 // Finds one customer by id. Returns undefined when there is no such customer.
 async function findCustomer(id) {
   if (!/^\d+$/.test(id)) return undefined;
-  const { rows } = await model.find([id]);
+  const [rows] = await model.find([id]);
   return rows[0];
 }
 
 // GET /api/customers/:id
-exports.getOne = async (req, res) => {
+async function find(req, res) {
   const customer = await findCustomer(req.params.id);
   if (!customer) return res.status(404).json({ message: 'Customer not found' });
   res.json({ customer });
-};
+}
 
 // ---------------------------------------------------------------- checking
 // Checks the form and prepares the values for the database.
@@ -140,12 +136,12 @@ async function readForm(body, current) {
 
 // Is this customer code already used? (capital / small letters ignored)
 async function codeExists(code) {
-  const { rows } = await model.codeExists([code]);
+  const [rows] = await model.codeExists([code]);
   return rows.length > 0;
 }
 
 // POST /api/customers
-exports.postAll = async (req, res) => {
+async function create(req, res) {
   const { errors, values } = await readForm(req.body, undefined);
 
   // Check the duplicate code only when everything else is fine
@@ -157,17 +153,17 @@ exports.postAll = async (req, res) => {
   }
 
   const { date, time } = nowLocal();
-  await insertRow('cusmast', {
+  await model.create({
     ...values,
     // created by / date / time
     cusucdnew: req.user.usdusd.slice(0, 30), cusentddt: date, cusenttime: time,
   });
 
   res.status(201).json({ message: `Customer '${values.cuscus}' added.` });
-};
+}
 
 // PUT /api/customers/:id
-exports.putOne = async (req, res) => {
+async function update(req, res) {
   const customer = await findCustomer(req.params.id);
   if (!customer) return res.status(404).json({ message: 'Customer not found' });
 
@@ -178,22 +174,22 @@ exports.putOne = async (req, res) => {
 
   const { date, time } = nowLocal();
   delete values.cuscus;   // the customer code is never changed
-  await updateRow('cusmast', 'cussno', customer.cussno, {
+  await model.update(customer.cussno, {
     ...values,
     // updated by / date / time
     cusucdame: req.user.usdusd.slice(0, 30), cusameddt: date, cusametime: time,
   });
 
   res.json({ message: `Customer '${customer.cuscus}' updated.` });
-};
+}
 
 // DELETE /api/customers/:id
-exports.deleteOne = async (req, res) => {
+async function remove(req, res) {
   const customer = await findCustomer(req.params.id);
   if (!customer) return res.status(404).json({ message: 'Customer not found' });
 
   await model.remove([customer.cussno]);
   res.json({ message: `Customer '${customer.cuscus}' deleted.` });
-};
+}
 
-
+module.exports = { lookups, nextCode, list, find, create, update, remove };

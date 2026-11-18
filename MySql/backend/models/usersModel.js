@@ -1,9 +1,15 @@
-// SQL for users; ? placeholders keep user input separate from SQL.
-const { pool } = require('./database');
-exports.codeExists = (params = []) => pool.query('SELECT 1 FROM usdmast WHERE lower(usdusd) = lower(?) AND usdcomsno = ? AND usdsno <> ?', params);
+const { pool, insertRow, updateRow } = require('../db');
 
-exports.find = (params = []) => pool.query('SELECT * FROM usdmast WHERE usdsno = ?', params);
+exports.codeExists = (values = []) => pool.execute('SELECT 1 FROM usdmast WHERE lower(usdusd) = lower(?) AND usdcomsno = ? AND usdsno <> ?', values);
 
-exports.list = (params = []) => pool.query('SELECT * FROM usdmast ORDER BY usdsno', params);
+exports.find = (values = []) => pool.execute('SELECT * FROM usdmast WHERE usdsno = ?', values);
 
-exports.remove = (params = []) => pool.query('DELETE FROM usdmast WHERE usdsno = ?', params);
+exports.list = (values = []) => pool.execute('SELECT * FROM usdmast ORDER BY usdsno', values);
+
+exports.remove = (values = []) => pool.execute('DELETE FROM usdmast WHERE usdsno = ?', values);
+
+exports.create = values => insertRow('usdmast', values);
+
+exports.update = (id, values) => updateRow('usdmast', 'usdsno', id, values);
+
+exports.findForLogin = code => pool.execute("SELECT * FROM usdmast WHERE usdusd = ? AND usdactflg <> 'N' ORDER BY usdcomsno LIMIT 1", [code]);

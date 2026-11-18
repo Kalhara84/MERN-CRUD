@@ -1,9 +1,15 @@
+// MySQL connection and the three small helpers shared by the API files.
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const config = {
-  host: process.env.DB_HOST || '127.0.0.1', port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER || 'root', password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'srtbf_farm', charset: 'utf8mb4', dateStrings: true, decimalNumbers: true,
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'srtbf_farm',
+  charset: 'utf8mb4',
+  dateStrings: true,
+  decimalNumbers: true,
 };
 
 const mysql = require('mysql2/promise');
