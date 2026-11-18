@@ -3,8 +3,15 @@ const { pool } = require('./db');
 const express = require('express');
 const cors = require('cors');
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5174' }));
-app.use(express.json({ limit: '100kb' }));
+
+app.use(cors({ 
+  origin: process.env.FRONTEND_URL
+}));
+
+app.use(express.json({ 
+  limit: '100kb' 
+}));
+
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/customers', require('./routes/customersRoutes'));
 app.use('/api/users', require('./routes/usersRoutes'));
@@ -25,7 +32,7 @@ app.use((error, req, res, next) => {
   res.status(error.status || 500).json({
      message: error.status === 400 ? 'Invalid request body' : 'Unable to complete the request. Please try again.' 
     });
-    
+
 });
 
 

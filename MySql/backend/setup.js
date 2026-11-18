@@ -55,14 +55,26 @@ async function migrate() {
 
 async function seed() {
   for (const row of require('./seed/lookups.json')) {
-    await pool.execute('INSERT INTO sysmast (syssno, sysrtp, sysrno, sysdes) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE syssno = syssno', row);
+    await pool.execute(
+      'INSERT INTO sysmast (syssno, sysrtp, sysrno, sysdes) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE syssno = syssno', row
+    );
   }
   const [rows] = await pool.execute('SELECT usdsno FROM usdmast LIMIT 1');
   if (!rows.length) {
     const password = process.env.ADMIN_PASSWORD;
     if (!password || password.length < 8) throw new Error('Set ADMIN_PASSWORD (at least 8 characters) in .env to create the first administrator');
     const { date, time } = nowLocal();
-    await insertRow('usdmast', { usdusd: process.env.ADMIN_CODE || 'ADMIN', usdnam: 'Farm administrator', usdpwd: await bcrypt.hash(password, 10), usdadmin: 'Y', usdactflg: 'Y', usdentddt: date, usdenttime: time, usducdnew: 'SETUP' });
+    await insertRow('usdmast', { 
+      usdusd: process.env.ADMIN_CODE, 
+      usdnam: 'Farm administrator', 
+      usdpwd: await bcrypt.hash(password, 10), 
+      usdadmin: 'Y', 
+      usdactflg: 'Y', 
+      usdentddt: date, 
+      usdenttime: time, 
+      usducdnew: 'SETUP' 
+    });
+
     console.log('Administrator created using ADMIN_CODE / ADMIN_PASSWORD from .env.');
   }
   console.log('Seed complete. Existing users and passwords were preserved.');
@@ -72,14 +84,21 @@ async function importCustomers() {
   const customers = require('./seed/customers.json');
   let added = 0;
   for (const customer of customers) {
-    const [rows] = await pool.execute('SELECT cussno FROM cusmast WHERE cuscus = ?', [customer.cuscus]);
+
+    const [rows] = await pool.execute(
+      'SELECT cussno FROM cusmast WHERE cuscus = ?', 
+      [customer.cuscus]
+    );
+
     if (rows.length) continue;
     const values = { ...customer };
     delete values.cussno;
+
     values.cusactyn = values.cusactyn || 'Y';
     for (const key of Object.keys(values)) {
       if (/ddt$|date$|time$/.test(key) && !values[key]) values[key] = null;
     }
+
     await insertRow('cusmast', values);
     added++;
   }
@@ -94,6 +113,7 @@ async function main() {
   else if (command === 'import') await importCustomers();
   else throw new Error('Use: node setup.js [setup|migrate|seed|import]');
 }
+
 main().catch(error => {
   console.error(error.message);
   process.exitCode = 1;
