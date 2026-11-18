@@ -118,6 +118,9 @@ exports.putOne = async (req, res) => {
   if (!user) return res.status(404).json({ message: 'User not found' });
 
   const { errors, values, password } = readForm(req.body, false);
+  if (user.usdsno === req.user.usdsno && (!values.usdadmin || values.usdactflg === 'N')) {
+    return res.status(400).json({ message: 'You cannot remove your own administrator access or block your account.' });
+  }
   if (Object.keys(errors).length === 0 && (await codeExists(values.usdusd, values.usdcomsno, user.usdsno))) {
     errors.usdusd = 'This User code already exists';
   }
@@ -151,5 +154,4 @@ exports.deleteOne = async (req, res) => {
   await model.remove([user.usdsno]);
   res.json({ message: `User '${user.usdusd}' deleted.` });
 };
-
 
