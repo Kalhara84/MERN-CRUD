@@ -69,6 +69,7 @@ export default function UserListPage({ me, showMessage }) {
                 </tr>
               </thead>
               <tbody>
+                {loading && <tr><td colSpan="10" className="py-8 text-center text-stone-500">Loading users…</td></tr>}
                 {shown.map((u) => (
                   <tr key={u.usdsno}>
                     <td>{u.usdsno}</td>

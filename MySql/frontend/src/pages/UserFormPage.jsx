@@ -24,7 +24,7 @@ const INPUTS = {
   usdatfnosetday: ['ATF no. of days', 'number'],
 };
 
-// Check boxes (switches):  column name -> label
+// Keep legacy flags in form state when editing. Only Active/Admin are shown below.
 const SWITCHES = {
   usdactflg: 'Active (can login)',
   usdadmin: 'Administrator',

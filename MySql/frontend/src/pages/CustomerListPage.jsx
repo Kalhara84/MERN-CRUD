@@ -87,6 +87,7 @@ export default function CustomerListPage({ showMessage }) {
                 </tr>
               </thead>
               <tbody>
+                {loading && <tr><td colSpan="11" className="py-8 text-center text-stone-500">Loading customers…</td></tr>}
                 {rows.map((c, i) => (
                   <tr key={c.cussno}>
                     <td>{firstRow + i + 1}</td>
