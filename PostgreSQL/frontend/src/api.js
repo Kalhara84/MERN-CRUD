@@ -1,5 +1,4 @@
-const API_URL = 'http://localhost:5000';
-
+const API_URL = import.meta.env.VITE_API_URL;
 export function getToken() {
   return localStorage.getItem('token') || sessionStorage.getItem('token');
 }
@@ -14,24 +13,27 @@ export function clearToken() {
 
 // ---- send one request
 async function request(method, path, body) {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = {
+    'Content-Type': 'application/json'
+  };
   const token = getToken();
-  if (token) headers.Authorization = 'Bearer ' + token;
-
+  if (token) {
+    headers.Authorization = 'Bearer ' + token;
+  }
   let res;
   try {
     res = await fetch(`${API_URL}/api${path}`, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: body ? JSON.stringify(body) : undefined
     });
   } catch (err) {
     throw new Error('Cannot reach the server. Please try again.');
   }
-
   let data = {};
-  try { data = await res.json(); } catch (err) { /* empty answer */ }
-
+  try {
+    data = await res.json();
+  } catch (err) {/* empty answer */}
   if (!res.ok) {
     // Login ended (token expired, user deleted or blocked) -> go to the login page
     if (res.status === 401 && path !== '/auth/login') {
@@ -46,10 +48,17 @@ async function request(method, path, body) {
   }
   return data;
 }
-
 export const api = {
-  get: (path) => request('GET', path),
-  post: (path, body) => request('POST', path, body || {}),
-  put: (path, body) => request('PUT', path, body || {}),
-  delete: (path) => request('DELETE', path),
+  get: path => {
+    return request('GET', path);
+  },
+  post: (path, body) => {
+    return request('POST', path, body || {});
+  },
+  put: (path, body) => {
+    return request('PUT', path, body || {});
+  },
+  delete: path => {
+    return request('DELETE', path);
+  }
 };

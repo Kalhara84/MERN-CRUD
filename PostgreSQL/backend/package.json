@@ -1,13 +1,15 @@
 {
-  "name": "curd-backend-simple",
+  "name": "srtbf-backend",
   "version": "1.0.0",
-  "description": "Simple Node.js + Express + PostgreSQL API (users + expire module + customers)",
+  "description": "SRTBF chicken farm - simple Express and PostgreSQL API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
     "db:setup": "node setup.js",
-    "db:import-customers": "node import-customers.js"
+    "db:import-customers": "node setup.js import",
+    "db:migrate": "node setup.js migrate",
+    "db:seed": "node setup.js seed"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -15,6 +17,6 @@
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.12.0"
+    "pg": "^8.13.1"
   }
 }
