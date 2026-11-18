@@ -13,8 +13,6 @@ import UserListPage from './pages/UserListPage';
 import UserFormPage from './pages/UserFormPage';
 import CustomerListPage from './pages/CustomerListPage';
 import CustomerFormPage from './pages/CustomerFormPage';
-import ExpireListPage from './pages/ExpireListPage';
-import ExpireFormPage from './pages/ExpireFormPage';
 
 export default function App() {
   const location = useLocation();
@@ -49,7 +47,7 @@ export default function App() {
   }
 
   if (checking) {
-    return <div className="d-flex justify-content-center align-items-center vh-100"><div className="spinner-border" /></div>;
+    return <div className="flex justify-center items-center min-h-screen"><div className="spinner" /></div>;
   }
 
   // ---- Not logged in: only the login page can be opened
@@ -65,7 +63,7 @@ export default function App() {
   // Users pages are for admin users only
   const adminOnly = (page) =>
     user.is_admin ? page : (
-      <div className="alert alert-danger m-4"><b>Admin only.</b> You do not have permission to open this page.</div>
+      <div className="rounded-xl p-4 bg-red-50 text-red-700 m-4"><b>Admin only.</b> You do not have permission to open this page.</div>
     );
 
   // ---- Logged in: every page is shown inside the Layout (sidebar + top bar)
@@ -73,12 +71,6 @@ export default function App() {
     <Layout user={user} message={message} onCloseMessage={() => setMessage(null)} onLogout={logout}>
       <Routes>
         <Route path="/" element={<DashboardPage user={user} />} />
-
-        {/* Expire Module */}
-        <Route path="/expire" element={<ExpireListPage showMessage={showMessage} />} />
-        <Route path="/expire/add" element={<ExpireFormPage showMessage={showMessage} />} />
-        <Route path="/expire/:id/edit" element={<ExpireFormPage showMessage={showMessage} />} />
-
         {/* Customers (all logged-in users) */}
         <Route path="/customers" element={<CustomerListPage showMessage={showMessage} />} />
         <Route path="/customers/add" element={<CustomerFormPage showMessage={showMessage} />} />

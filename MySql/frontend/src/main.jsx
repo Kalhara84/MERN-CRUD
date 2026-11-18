@@ -1,3 +1,4 @@
+import './styles.css';
 // main.jsx - starts the React app
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';

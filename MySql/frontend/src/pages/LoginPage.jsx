@@ -1,113 +1,41 @@
-// =============================================================================
-// pages/LoginPage.jsx - the login page
-// =============================================================================
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Bird, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { api, saveToken } from '../api';
-import { APP_NAME } from '../helpers';
 
 export default function LoginPage({ onLogin }) {
+  const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [usdusd, setUsdusd] = useState('');      // user code
-  const [usdpwd, setUsdpwd] = useState('');      // password
-  const [remember, setRemember] = useState(false);
-  const [showPwd, setShowPwd] = useState(false);
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  // This page has its own background style (jw-login)
-  useEffect(() => {
-    document.title = `Login | ${APP_NAME}`;
-    document.body.classList.add('jw-login');
-    return () => document.body.classList.remove('jw-login');
-  }, []);
-
-  async function submit(e) {
-    e.preventDefault();
-    setError('');
-
-    if (!usdusd.trim() || !usdpwd) {
-      setError('Please enter User Code and Password');
-      return;
-    }
-
-    setBusy(true);
+  async function submit(event) {
+    event.preventDefault(); setBusy(true); setError('');
     try {
-      const data = await api.post('/auth/login', { usdusd: usdusd.trim(), usdpwd, remember });
-      saveToken(data.token, remember);
-      onLogin(data.user);
-      // Go to the page the user wanted before login, or to the dashboard
-      navigate((location.state && location.state.from) || '/', { replace: true });
-    } catch (err) {
-      setError(err.message);   // Invalid User Code / Invalid Password
-      setUsdpwd('');
-      setBusy(false);
-    }
+      const data = await api.post('/auth/login', { usdusd: code, usdpwd: password, remember });
+      saveToken(data.token, remember); onLogin(data.user);
+      navigate(location.state?.from || '/', { replace: true });
+    } catch (error) { setError(error.message); } finally { setBusy(false); }
   }
-
-  return (
-    <div className="jw-login-wrap">
-      {/* LEFT SIDE: brand name and pictures */}
-      <section className="jw-login-hero">
-        <div className="brand"><img src="/assets/img/jw-logo.svg" alt={APP_NAME} /><span>{APP_NAME}</span></div>
-        <div>
-          <h1>Crafting trust,<br /><em>one gem at a time.</em></h1>
-          <p>Stock, customers, suppliers and pricing for your jewellery business &mdash; all in one elegant place.</p>
-          <div className="gems">
-            <img src="/assets/img/diamond.svg" alt="diamond" />
-            <img src="/assets/img/ring.svg" alt="ring" />
-            <img src="/assets/img/necklace.svg" alt="necklace" />
-            <img src="/assets/img/earring.svg" alt="earrings" />
-            <img src="/assets/img/bangle.svg" alt="bangle" />
-          </div>
-        </div>
-        <small>&copy; {new Date().getFullYear()} {APP_NAME} Jewellers</small>
-      </section>
-
-      {/* RIGHT SIDE: the login form */}
-      <section className="jw-login-panel">
-        <div className="jw-login-card">
-          <img className="logo-m" src="/assets/img/jw-logo.svg" alt={APP_NAME} />
-          <h2>Welcome back</h2>
-          <p className="sub">Sign in to continue to your dashboard.</p>
-
-          <form id="login" onSubmit={submit} autoComplete="off" noValidate>
-            {error && (
-              <div className="alert alert-danger py-2 mb-3"><i className="bi bi-x-circle" /> <b>{error}</b></div>
-            )}
-
-            <div className="jw-input">
-              <i className="bi bi-person lead-ico" />
-              <input type="text" value={usdusd} onChange={(e) => setUsdusd(e.target.value)}
-                className="form-control" placeholder="User Name" autoComplete="off" autoFocus />
-            </div>
-            <div className="jw-input">
-              <i className="bi bi-lock lead-ico" />
-              <input type={showPwd ? 'text' : 'password'} value={usdpwd} onChange={(e) => setUsdpwd(e.target.value)}
-                className="form-control" placeholder="Password" autoComplete="off" />
-              <button type="button" className="toggle-pwd" tabIndex={-1} aria-label="Show password" onClick={() => setShowPwd(!showPwd)}>
-                <i className={`bi ${showPwd ? 'bi-eye-slash' : 'bi-eye'}`} />
-              </button>
-            </div>
-
-            {/* Remember me: ticked = stay logged in for 14 days */}
-            <div className="links">
-              <div className="form-check m-0">
-                <input className="form-check-input" type="checkbox" id="remember" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
-                <label className="form-check-label" htmlFor="remember">Remember me</label>
-              </div>
-            </div>
-
-            <button type="submit" className="btn btn-primary btn-signin w-100" disabled={busy}>
-              {busy ? 'Signing in...' : 'Sign In'}
-            </button>
-          </form>
-
-          <div className="jw-login-foot"><i className="bi bi-shield-check" /> Secure staff access only</div>
-        </div>
-      </section>
-    </div>
-  );
+  return <div className="grid min-h-screen lg:grid-cols-2">
+    <section className="relative flex min-h-72 flex-col justify-between overflow-hidden bg-[#254d32] p-9 text-white lg:p-14">
+      <img src="/images/farm.jpg" alt="Chickens at a poultry farm" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#163923] via-transparent to-[#163923]/30" />
+      <div className="relative flex items-center gap-3 text-2xl font-bold"><Bird size={32} />SRTBF.</div>
+      <div className="relative my-12 max-w-lg"><p className="mb-5 text-xs uppercase tracking-[.25em] text-green-200">Rooted in care. Growing with purpose.</p><h1 className="text-4xl font-semibold leading-tight lg:text-6xl">A healthier farm.<br />A brighter tomorrow.</h1><p className="mt-6 max-w-sm leading-7 text-green-100">Your customers, your people, and a clearer picture of your farm. All in one place.</p></div>
+      <p className="relative text-xs text-green-100">SRTBF Chicken Farm · Farm management</p>
+    </section>
+    <section className="flex items-center justify-center bg-[#fbfcfa] px-7 py-14"><div className="w-full max-w-sm"><span className="mb-7 inline-flex rounded-2xl bg-green-100 p-4 text-green-800"><Bird size={28} /></span><p className="text-xs uppercase tracking-[.2em] text-green-700">Welcome to the farm</p><h2 className="mt-3 text-3xl font-semibold tracking-tight">Good to see you again.</h2><p className="mb-9 mt-3 text-sm text-stone-500">Sign in to your SRTBF workspace.</p>
+      <form onSubmit={submit} className="space-y-5">
+        {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+        <div><label htmlFor="code" className="mb-2 block text-sm font-medium">User code</label><input id="code" className="field" autoComplete="username" required value={code} onChange={e => setCode(e.target.value)} placeholder="Enter your user code" /></div>
+        <div><label htmlFor="password" className="mb-2 block text-sm font-medium">Password</label><div className="relative"><input id="password" className="field pr-12" type={visible ? 'text' : 'password'} autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" /><button type="button" className="absolute right-3 top-3 text-stone-400" aria-label={visible ? 'Hide password' : 'Show password'} onClick={() => setVisible(!visible)}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></div>
+        <label className="flex items-center gap-2 text-sm text-stone-500"><input type="checkbox" className="accent-green-700" checked={remember} onChange={e => setRemember(e.target.checked)} />Keep me signed in</label>
+        <button disabled={busy} className="button button-primary w-full py-3.5">{busy ? 'Signing in…' : 'Sign in to workspace'}<ArrowRight size={18} /></button>
+      </form><p className="mt-8 text-center text-xs text-stone-400">Need access? Contact your farm administrator.</p>
+    </div></section>
+  </div>;
 }

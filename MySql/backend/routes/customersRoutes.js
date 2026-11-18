@@ -1,0 +1,10 @@
+const router = require('express').Router();
+const controller = require('../controllers/customersController');
+router.get('/lookups', controller.get_lookups);
+router.get('/next-code', controller.get_next_code);
+router.get('/', controller.getAll);
+router.get('/:id', controller.getOne);
+router.post('/', controller.postAll);
+router.put('/:id', controller.putOne);
+router.delete('/:id', controller.deleteOne);
+module.exports = router;

@@ -1,5 +1,5 @@
 // =============================================================================
-// pages/UserListPage.jsx - Users page: table of all users
+// pages/UserListPage.jsx - Users page: w-full text-left text-sm of all users
 // =============================================================================
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -50,52 +50,52 @@ export default function UserListPage({ me, showMessage }) {
 
   return (
     <>
-      <div className="jw-card">
-        <div className="jw-card-head">
-          <h5><i className="bi bi-people" /> User master <span className="text-muted small">({users.length})</span></h5>
-          <div className="d-flex gap-2">
-            <input type="search" className="form-control form-control-sm" placeholder="Search..." style={{ width: 200 }}
+      <div className="rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 p-5">
+          <h5> Your farm team <span className="text-stone-500 text-sm">({users.length})</span></h5>
+          <div className="flex gap-2">
+            <input type="search" className="field " aria-label="Search records" placeholder="Search records..." style={{ width: 200 }}
               value={search} onChange={(e) => setSearch(e.target.value)} />
-            <Link to="/users/add" className="btn btn-primary btn-sm"><i className="bi bi-plus-lg" /> Add User</Link>
+            <Link to="/users/add" className="button button-primary text-xs">+ Add User</Link>
           </div>
         </div>
-        <div className="jw-card-body">
-          <div className="table-responsive">
-            <table className="table jw-table align-middle">
+        <div className="p-5">
+          <div className="overflow-x-auto">
+            <w-full text-left text-sm className="w-full text-left text-sm  ">
               <thead>
                 <tr>
                   <th>#</th><th>User code</th><th>Name</th><th>Designation</th><th>Email</th>
-                  <th>Admin</th><th>Status</th><th>Updated by</th><th>Updated on</th><th className="text-end">Actions</th>
+                  <th>Admin</th><th>Status</th><th>Updated by</th><th>Updated on</th><th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {shown.map((u) => (
                   <tr key={u.usdsno}>
                     <td>{u.usdsno}</td>
-                    <td className="fw-semibold">{u.usdusd}</td>
+                    <td className="font-semibold">{u.usdusd}</td>
                     <td>{u.usdnam || ''}</td>
                     <td>{u.usddesig}</td>
                     <td>{u.usdemail}</td>
-                    <td>{u.is_admin ? <span className="badge text-bg-dark">Admin</span> : <span className="text-muted">-</span>}</td>
-                    <td>{u.is_active ? <span className="badge text-bg-success">Active</span> : <span className="badge text-bg-danger">Blocked</span>}</td>
+                    <td>{u.is_admin ? <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium bg-stone-100 text-stone-700">Admin</span> : <span className="text-stone-500">-</span>}</td>
+                    <td>{u.is_active ? <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium bg-green-50 text-green-700">Active</span> : <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700">Blocked</span>}</td>
                     <td>{u.usducdame || '-'}</td>
                     <td>{dateTime(u.usdameddt, u.usdametime)}</td>
-                    <td className="text-end text-nowrap">
-                      <Link to={`/users/${u.usdsno}/edit`} className="btn btn-outline-gold btn-sm"><i className="bi bi-pencil" /></Link>
-                      {/* A user cannot delete himself, so no button on his own row */}
+                    <td className="text-right whitespace-nowrap">
+                      <Link to={`/users/${u.usdsno}/edit`} className="button button-light text-xs">Edit</Link>
+                      {/* A user cannot delete himself, so no button on his own grid grid-cols-12 */}
                       {u.usdsno !== me.usdsno && (
-                        <button type="button" className="btn btn-outline-danger btn-sm ms-1" onClick={() => setToDelete(u)}>
-                          <i className="bi bi-trash" />
+                        <button type="button" className="button button-danger text-xs ml-1" onClick={() => setToDelete(u)}>
+                          Delete
                         </button>
                       )}
                     </td>
                   </tr>
                 ))}
                 {!loading && shown.length === 0 && (
-                  <tr><td colSpan="10" className="text-center text-muted py-4">No users yet.</td></tr>
+                  <tr><td colSpan="10" className="text-center text-stone-500 py-4">No users yet.</td></tr>
                 )}
               </tbody>
-            </table>
+            </w-full text-left text-sm>
           </div>
         </div>
       </div>

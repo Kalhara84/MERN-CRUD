@@ -20,7 +20,7 @@ const INPUTS = {
   cusad5: ['Address-5', 'text', 40],
   custelno: ['Tel', 'text', 25],
   cusfaxno: ['Fax', 'text', 25],
-  cusemail: ['E-mail', 'text', 50],
+  cusemail: ['E-mail', 'email', 25],
   custinno: ['TIN #', 'text', 20],
   cusvatno: ['VAT Reg #', 'text', 15],
   cussvatno: ['SVAT Reg #', 'text', 25],
@@ -33,7 +33,7 @@ const SELECTS = {
   cusrepsno: ['Rep', 'rep'],
 };
 
-// The page is drawn as cards:  [card title, fields in it, wide fields (they use a whole row)]
+// The page is drawn as cards:  [card title, fields in it, wide fields (they use a whole grid grid-cols-12)]
 const SECTIONS = [
   ['Customer', ['cuscus', 'cusnam', 'cuscatsno', 'cusrepsno']],
   ['Credit', ['cuscredittmssno', 'cuscreditlimit']],
@@ -127,23 +127,23 @@ export default function CustomerFormPage({ showMessage }) {
     }
   }
 
-  if (loading) return <div className="text-center py-5"><div className="spinner-border" /></div>;
+  if (loading) return <div className="text-center py-5"><div className="spinner" /></div>;
 
   // One text box with its label and red message
   function renderInput(name, wide) {
     const [label, type, max] = INPUTS[name];
     const isCode = name === 'cuscus';
     return (
-      <div className={wide ? 'col-12' : 'col-md-6 col-xl-4'} key={name}>
-        <label className="form-label fw-semibold" htmlFor={name}>{label}</label>
+      <div className={wide ? 'col-span-12' : 'col-span-12 md:col-span-6 xl:col-span-4'} key={name}>
+        <label className="mb-2 block text-sm font-semibold" htmlFor={name}>{label}</label>
         <input id={name} type={type} maxLength={max} min={type === 'number' ? 0 : undefined} value={form[name]}
-          className={`form-control ${errors[name] ? 'is-invalid' : ''}`}
+          className={`field ${errors[name] ? 'border-red-500' : ''}`}
           autoComplete="off"
           readOnly={isCode && isEdit}   // the customer code cannot be changed after the customer is saved
           // Codes are written in capital letters
           onChange={(e) => change(name, isCode ? e.target.value.toUpperCase() : e.target.value)} />
-        {isCode && isEdit && <div className="form-text">The code cannot be changed.</div>}
-        {errors[name] && <div className="text-danger small">{errors[name]}</div>}
+        {isCode && isEdit && <div className="mt-1 text-xs text-stone-500">The code cannot be changed.</div>}
+        {errors[name] && <div className="text-red-600 text-sm">{errors[name]}</div>}
       </div>
     );
   }
@@ -155,15 +155,15 @@ export default function CustomerFormPage({ showMessage }) {
     // An old customer can hold a value that is not in the list. Show it, so it is not lost silently.
     const unknown = form[name] && !items.some((item) => item.id === Number(form[name]));
     return (
-      <div className="col-md-6 col-xl-4" key={name}>
-        <label className="form-label fw-semibold" htmlFor={name}>{label}</label>
-        <select id={name} value={form[name]} className={`form-select ${errors[name] ? 'is-invalid' : ''}`}
+      <div className="col-span-12 md:col-span-6 xl:col-span-4" key={name}>
+        <label className="mb-2 block text-sm font-semibold" htmlFor={name}>{label}</label>
+        <select id={name} value={form[name]} className={`field ${errors[name] ? 'border-red-500' : ''}`}
           onChange={(e) => change(name, Number(e.target.value))}>
           <option value={0}>-- None --</option>
           {unknown && <option value={form[name]}>Old value ({form[name]})</option>}
           {items.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
         </select>
-        {errors[name] && <div className="text-danger small">{errors[name]}</div>}
+        {errors[name] && <div className="text-red-600 text-sm">{errors[name]}</div>}
       </div>
     );
   }
@@ -172,19 +172,19 @@ export default function CustomerFormPage({ showMessage }) {
     <form onSubmit={save} noValidate>
       {/* One card for each group of fields */}
       {SECTIONS.map(([title, names, wideNames = []]) => (
-        <div className="jw-card mb-3" key={title}>
-          <div className="jw-card-head"><h5>{title}</h5></div>
-          <div className="jw-card-body">
-            <div className="row g-3">
+        <div className="rounded-2xl border border-stone-200 bg-white shadow-sm mb-3" key={title}>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 p-5"><h5>{title}</h5></div>
+          <div className="p-5">
+            <div className="grid grid-cols-12 gap-5">
               {names.map((name) => (name in SELECTS ? renderSelect(name) : renderInput(name, wideNames.includes(name))))}
 
               {/* The Active switch sits in the first card, next to the name */}
               {title === 'Customer' && (
-                <div className="col-md-6 col-xl-4 d-flex align-items-end">
-                  <div className="form-check form-switch">
-                    <input id="cusactyn" type="checkbox" className="form-check-input" checked={form.cusactyn}
+                <div className="col-span-12 md:col-span-6 xl:col-span-4 flex items-end">
+                  <div className="flex items-center gap-2 py-2 ">
+                    <input id="cusactyn" type="checkbox" className="h-4 w-4 accent-green-700" checked={form.cusactyn}
                       onChange={(e) => change('cusactyn', e.target.checked)} />
-                    <label className="form-check-label" htmlFor="cusactyn">Active</label>
+                    <label className="text-sm" htmlFor="cusactyn">Active</label>
                   </div>
                 </div>
               )}
@@ -195,12 +195,12 @@ export default function CustomerFormPage({ showMessage }) {
 
       {/* Edit page: who changed this customer last, and when */}
       {isEdit && saved && saved.cusucdame && (
-        <p className="text-muted small">Last updated by <b>{saved.cusucdame}</b> on {dateTime(saved.cusameddt, saved.cusametime)}</p>
+        <p className="text-stone-500 text-sm">Last updated by <b>{saved.cusucdame}</b> on {dateTime(saved.cusameddt, saved.cusametime)}</p>
       )}
 
-      <div className="d-flex gap-2">
-        <button type="submit" className="btn btn-primary" disabled={busy}><i className="bi bi-check-lg" /> Save</button>
-        <Link to="/customers" className="btn btn-light">Cancel</Link>
+      <div className="flex gap-2">
+        <button type="submit" className="button button-primary" disabled={busy}> Save</button>
+        <Link to="/customers" className="button button-light">Cancel</Link>
       </div>
     </form>
   );

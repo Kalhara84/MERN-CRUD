@@ -1,6 +1,6 @@
 // helpers.js - the app name and small helpers for dates
 
-export const APP_NAME = 'JW Africa';
+export const APP_NAME = 'SRTBF';
 
 // Today as YYYY-MM-DD (the format of <input type="date">)
 export function todayLocal() {

@@ -1,5 +1,5 @@
 // =============================================================================
-// pages/CustomerListPage.jsx - Customers page: table of all customers
+// pages/CustomerListPage.jsx - Customers page: w-full text-left text-sm of all customers
 //   View (eye button), Edit (pencil button), Delete (bin button), Add (top right)
 // =============================================================================
 import { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import { api } from '../api';
 import Modal, { ConfirmDelete } from '../components/Modal';
 import { dateTime } from '../helpers';
 
-const PAGE_SIZE = 50;   // how many rows are shown on one page of the table
+const PAGE_SIZE = 50;   // how many rows are shown on one page of the w-full text-left text-sm
 
 export default function CustomerListPage({ showMessage }) {
   const [customers, setCustomers] = useState([]);
@@ -60,37 +60,37 @@ export default function CustomerListPage({ showMessage }) {
     setBusy(false);
   }
 
-  // A small "Active" / "Not active" badge. Only 'N' means not active.
+  // A text-sm "Active" / "Not active" inline-flex rounded-full px-2.5 py-1 text-xs font-medium. Only 'N' means not active.
   const statusBadge = (c) =>
     c.cusactyn === 'N'
-      ? <span className="badge text-bg-danger">Not active</span>
-      : <span className="badge text-bg-success">Active</span>;
+      ? <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700">Not active</span>
+      : <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium bg-green-50 text-green-700">Active</span>;
 
   return (
     <>
-      <div className="jw-card">
-        <div className="jw-card-head">
-          <h5><i className="bi bi-person-lines-fill" /> Customer master <span className="text-muted small">({customers.length})</span></h5>
-          <div className="d-flex gap-2">
-            <input type="search" className="form-control form-control-sm" placeholder="Search..." style={{ width: 200 }}
+      <div className="rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 p-5">
+          <h5> Customer directory <span className="text-stone-500 text-sm">({customers.length})</span></h5>
+          <div className="flex gap-2">
+            <input type="search" className="field " aria-label="Search records" placeholder="Search records..." style={{ width: 200 }}
               value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-            <Link to="/customers/add" className="btn btn-primary btn-sm"><i className="bi bi-plus-lg" /> Add Customer</Link>
+            <Link to="/customers/add" className="button button-primary text-xs">+ Add Customer</Link>
           </div>
         </div>
-        <div className="jw-card-body">
-          <div className="table-responsive">
-            <table className="table jw-table align-middle">
+        <div className="p-5">
+          <div className="overflow-x-auto">
+            <w-full text-left text-sm className="w-full text-left text-sm  ">
               <thead>
                 <tr>
                   <th>#</th><th>Code</th><th>Name</th><th>Category</th><th>Address-1</th><th>Tel</th>
-                  <th>E-mail</th><th>TIN #</th><th>VAT Reg #</th><th>Status</th><th className="text-end">Actions</th>
+                  <th>E-mail</th><th>TIN #</th><th>VAT Reg #</th><th>Status</th><th className="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((c, i) => (
                   <tr key={c.cussno}>
                     <td>{firstRow + i + 1}</td>
-                    <td className="fw-semibold">{c.cuscus}</td>
+                    <td className="font-semibold">{c.cuscus}</td>
                     <td>{c.cusnam}</td>
                     <td>{c.cat_name || '-'}</td>
                     <td>{c.cusad1}</td>
@@ -99,39 +99,39 @@ export default function CustomerListPage({ showMessage }) {
                     <td>{c.custinno}</td>
                     <td>{c.cusvatno}</td>
                     <td>{statusBadge(c)}</td>
-                    <td className="text-end text-nowrap">
-                      <button type="button" className="btn btn-outline-secondary btn-sm" title="View" onClick={() => setToView(c)}>
-                        <i className="bi bi-eye" />
+                    <td className="text-right whitespace-nowrap">
+                      <button type="button" className="button button-light text-xs" title="View" onClick={() => setToView(c)}>
+                        View
                       </button>
-                      <Link to={`/customers/${c.cussno}/edit`} className="btn btn-outline-gold btn-sm ms-1" title="Edit">
-                        <i className="bi bi-pencil" />
+                      <Link to={`/customers/${c.cussno}/edit`} className="button button-light text-xs ml-1" title="Edit">
+                        Edit
                       </Link>
-                      <button type="button" className="btn btn-outline-danger btn-sm ms-1" title="Delete" onClick={() => setToDelete(c)}>
-                        <i className="bi bi-trash" />
+                      <button type="button" className="button button-danger text-xs ml-1" title="Delete" onClick={() => setToDelete(c)}>
+                        Delete
                       </button>
                     </td>
                   </tr>
                 ))}
                 {!loading && shown.length === 0 && (
-                  <tr><td colSpan="11" className="text-center text-muted py-4">No customers found.</td></tr>
+                  <tr><td colSpan="11" className="text-center text-stone-500 py-4">No customers found.</td></tr>
                 )}
               </tbody>
-            </table>
+            </w-full text-left text-sm>
           </div>
 
           {/* Page buttons (only when there is more than one page) */}
           {pageCount > 1 && (
-            <div className="d-flex justify-content-between align-items-center mt-2">
-              <small className="text-muted">
+            <div className="flex justify-between items-center mt-2">
+              <text-sm className="text-stone-500">
                 Showing {firstRow + 1} - {firstRow + rows.length} of {shown.length}
-              </small>
-              <div className="d-flex gap-1">
-                <button type="button" className="btn btn-light btn-sm" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
-                  <i className="bi bi-chevron-left" /> Previous
+              </text-sm>
+              <div className="flex gap-1">
+                <button type="button" className="button button-light text-xs" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
+                   Previous
                 </button>
-                <span className="align-self-center small px-2">Page {currentPage} / {pageCount}</span>
-                <button type="button" className="btn btn-light btn-sm" disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>
-                  Next <i className="bi bi-chevron-right" />
+                <span className="self-center text-sm px-2">Page {currentPage} / {pageCount}</span>
+                <button type="button" className="button button-light text-xs" disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>
+                  Next 
                 </button>
               </div>
             </div>
@@ -145,9 +145,9 @@ export default function CustomerListPage({ showMessage }) {
           title={`Customer ${toView.cuscus}`}
           onClose={() => setToView(null)}
           onSubmit={(e) => { e.preventDefault(); setToView(null); }}
-          footer={<button type="button" className="btn btn-light" onClick={() => setToView(null)}>Close</button>}
+          footer={<button type="button" className="button button-light" onClick={() => setToView(null)}>Close</button>}
         >
-          <table className="table table-sm mb-0">
+          <w-full text-left text-sm className="w-full text-left text-sm  mb-0">
             <tbody>
               {[
                 ['Name', toView.cusnam],
@@ -168,13 +168,13 @@ export default function CustomerListPage({ showMessage }) {
                 ['VAT Reg #', toView.cusvatno],
                 ['SVAT Reg #', toView.cussvatno],
               ].map(([label, value]) => (
-                <tr key={label}><th className="w-25 text-muted fw-normal">{label}</th><td>{value || '-'}</td></tr>
+                <tr key={label}><th className="w-1/4 text-stone-500 font-normal">{label}</th><td>{value || '-'}</td></tr>
               ))}
-              <tr><th className="text-muted fw-normal">Status</th><td>{statusBadge(toView)}</td></tr>
-              <tr><th className="text-muted fw-normal">Created</th><td>{toView.cusucdnew || '-'} &middot; {dateTime(toView.cusentddt, toView.cusenttime)}</td></tr>
-              <tr><th className="text-muted fw-normal">Updated</th><td>{toView.cusucdame || '-'} &middot; {dateTime(toView.cusameddt, toView.cusametime)}</td></tr>
+              <tr><th className="text-stone-500 font-normal">Status</th><td>{statusBadge(toView)}</td></tr>
+              <tr><th className="text-stone-500 font-normal">Created</th><td>{toView.cusucdnew || '-'} &middot; {dateTime(toView.cusentddt, toView.cusenttime)}</td></tr>
+              <tr><th className="text-stone-500 font-normal">Updated</th><td>{toView.cusucdame || '-'} &middot; {dateTime(toView.cusameddt, toView.cusametime)}</td></tr>
             </tbody>
-          </table>
+          </w-full text-left text-sm>
         </Modal>
       )}
 
