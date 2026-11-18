@@ -53,7 +53,7 @@ export default function UserListPage({ me, showMessage }) {
       <div className="rounded-2xl border border-stone-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 p-5">
           <h5> Your farm team <span className="text-stone-500 text-sm">({users.length})</span></h5>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <input type="search" className="field " aria-label="Search records" placeholder="Search records..." style={{ width: 200 }}
               value={search} onChange={(e) => setSearch(e.target.value)} />
             <Link to="/users/add" className="button button-primary text-xs">+ Add User</Link>
@@ -61,7 +61,7 @@ export default function UserListPage({ me, showMessage }) {
         </div>
         <div className="p-5">
           <div className="overflow-x-auto">
-            <w-full text-left text-sm className="w-full text-left text-sm  ">
+            <table className="w-full text-left text-sm  ">
               <thead>
                 <tr>
                   <th>#</th><th>User code</th><th>Name</th><th>Designation</th><th>Email</th>
@@ -82,7 +82,7 @@ export default function UserListPage({ me, showMessage }) {
                     <td>{dateTime(u.usdameddt, u.usdametime)}</td>
                     <td className="text-right whitespace-nowrap">
                       <Link to={`/users/${u.usdsno}/edit`} className="button button-light text-xs">Edit</Link>
-                      {/* A user cannot delete himself, so no button on his own grid grid-cols-12 */}
+                      {/* A user cannot delete himself, so no button on his own row */}
                       {u.usdsno !== me.usdsno && (
                         <button type="button" className="button button-danger text-xs ml-1" onClick={() => setToDelete(u)}>
                           Delete
@@ -95,7 +95,7 @@ export default function UserListPage({ me, showMessage }) {
                   <tr><td colSpan="10" className="text-center text-stone-500 py-4">No users yet.</td></tr>
                 )}
               </tbody>
-            </w-full text-left text-sm>
+            </table>
           </div>
         </div>
       </div>

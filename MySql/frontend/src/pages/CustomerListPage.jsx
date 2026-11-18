@@ -71,7 +71,7 @@ export default function CustomerListPage({ showMessage }) {
       <div className="rounded-2xl border border-stone-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-stone-100 p-5">
           <h5> Customer directory <span className="text-stone-500 text-sm">({customers.length})</span></h5>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <input type="search" className="field " aria-label="Search records" placeholder="Search records..." style={{ width: 200 }}
               value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
             <Link to="/customers/add" className="button button-primary text-xs">+ Add Customer</Link>
@@ -79,7 +79,7 @@ export default function CustomerListPage({ showMessage }) {
         </div>
         <div className="p-5">
           <div className="overflow-x-auto">
-            <w-full text-left text-sm className="w-full text-left text-sm  ">
+            <table className="w-full text-left text-sm  ">
               <thead>
                 <tr>
                   <th>#</th><th>Code</th><th>Name</th><th>Category</th><th>Address-1</th><th>Tel</th>
@@ -116,15 +116,15 @@ export default function CustomerListPage({ showMessage }) {
                   <tr><td colSpan="11" className="text-center text-stone-500 py-4">No customers found.</td></tr>
                 )}
               </tbody>
-            </w-full text-left text-sm>
+            </table>
           </div>
 
           {/* Page buttons (only when there is more than one page) */}
           {pageCount > 1 && (
             <div className="flex justify-between items-center mt-2">
-              <text-sm className="text-stone-500">
+              <small className="text-stone-500">
                 Showing {firstRow + 1} - {firstRow + rows.length} of {shown.length}
-              </text-sm>
+              </small>
               <div className="flex gap-1">
                 <button type="button" className="button button-light text-xs" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
                    Previous
@@ -147,7 +147,7 @@ export default function CustomerListPage({ showMessage }) {
           onSubmit={(e) => { e.preventDefault(); setToView(null); }}
           footer={<button type="button" className="button button-light" onClick={() => setToView(null)}>Close</button>}
         >
-          <w-full text-left text-sm className="w-full text-left text-sm  mb-0">
+          <table className="w-full text-left text-sm  mb-0">
             <tbody>
               {[
                 ['Name', toView.cusnam],
@@ -174,7 +174,7 @@ export default function CustomerListPage({ showMessage }) {
               <tr><th className="text-stone-500 font-normal">Created</th><td>{toView.cusucdnew || '-'} &middot; {dateTime(toView.cusentddt, toView.cusenttime)}</td></tr>
               <tr><th className="text-stone-500 font-normal">Updated</th><td>{toView.cusucdame || '-'} &middot; {dateTime(toView.cusameddt, toView.cusametime)}</td></tr>
             </tbody>
-          </w-full text-left text-sm>
+          </table>
         </Modal>
       )}
 

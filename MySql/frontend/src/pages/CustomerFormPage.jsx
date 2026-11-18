@@ -33,7 +33,7 @@ const SELECTS = {
   cusrepsno: ['Rep', 'rep'],
 };
 
-// The page is drawn as cards:  [card title, fields in it, wide fields (they use a whole grid grid-cols-12)]
+// The page is drawn as cards:  [card title, fields in it, wide fields (they use a whole row)]
 const SECTIONS = [
   ['Customer', ['cuscus', 'cusnam', 'cuscatsno', 'cusrepsno']],
   ['Credit', ['cuscredittmssno', 'cuscreditlimit']],
