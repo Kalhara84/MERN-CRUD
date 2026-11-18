@@ -4,11 +4,14 @@ const users = require('../models/usersModel');
 const {
   safeUser
 } = require('../auth');
+
 const SECRET = process.env.JWT_SECRET;
+
 async function login(req, res) {
   const code = String(req.body.usdusd || '').trim();
   const password = String(req.body.usdpwd || '');
   const remember = Boolean(req.body.remember);
+  
   if (!code || !password) {
     return res.status(400).json({
       message: 'Please enter User Code and Password'
@@ -18,6 +21,7 @@ async function login(req, res) {
   // Find the user (capital / small letters do not matter). Blocked users (usdactflg = 'N') are skipped.
   const [rows] = await users.findForLogin(code);
   const user = rows[0];
+  
   if (!user) {
     return res.status(401).json({
       message: 'Invalid user code or password'
@@ -37,16 +41,20 @@ async function login(req, res) {
   }, SECRET, {
     expiresIn: remember ? '14d' : '12h'
   });
+
   res.json({
     token,
     user: safeUser(user)
   });
+
 }
+
 function me(req, res) {
   res.json({
     user: req.user
   });
 }
+
 module.exports = {
   login,
   me
