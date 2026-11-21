@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 560" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b6bff"/><stop offset="1" stop-color="#5b3df5"/></linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb36b"/><stop offset="1" stop-color="#ff6a3d"/></linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#0ea5a0"/></linearGradient>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d4aff" stop-opacity=".35"/><stop offset="1" stop-color="#6d4aff" stop-opacity="0"/></linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0d0830" flood-opacity=".35"/></filter>
+    <filter id="sh2" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0d0830" flood-opacity=".3"/></filter>
+  </defs>
+
+  <!-- glow blobs -->
+  <circle cx="330" cy="290" r="230" fill="#7c5cff" opacity=".18"/>
+  <circle cx="330" cy="290" r="165" fill="#7c5cff" opacity=".16"/>
+
+  <!-- main dashboard window -->
+  <g filter="url(#sh)">
+    <rect x="70" y="80" width="440" height="300" rx="22" fill="#ffffff"/>
+  </g>
+  <rect x="70" y="80" width="440" height="44" rx="22" fill="#f3f0ff"/>
+  <rect x="70" y="102" width="440" height="22" fill="#f3f0ff"/>
+  <circle cx="98" cy="102" r="6" fill="#ff7a6b"/><circle cx="118" cy="102" r="6" fill="#ffc861"/><circle cx="138" cy="102" r="6" fill="#4ade80"/>
+  <rect x="330" y="95" width="150" height="14" rx="7" fill="#e3dcff"/>
+
+  <!-- sidebar -->
+  <rect x="92" y="144" width="62" height="216" rx="12" fill="#f7f5ff"/>
+  <rect x="102" y="158" width="42" height="12" rx="6" fill="url(#g1)"/>
+  <rect x="102" y="184" width="42" height="9" rx="4.5" fill="#d9d1ff"/>
+  <rect x="102" y="204" width="34" height="9" rx="4.5" fill="#d9d1ff"/>
+  <rect x="102" y="224" width="38" height="9" rx="4.5" fill="#d9d1ff"/>
+
+  <!-- stat tiles -->
+  <rect x="170" y="144" width="100" height="62" rx="14" fill="#f3f0ff"/>
+  <rect x="182" y="156" width="40" height="8" rx="4" fill="#b9a9ff"/>
+  <rect x="182" y="174" width="62" height="16" rx="6" fill="#5b3df5"/>
+  <rect x="282" y="144" width="100" height="62" rx="14" fill="#fff1e8"/>
+  <rect x="294" y="156" width="40" height="8" rx="4" fill="#ffc4a3"/>
+  <rect x="294" y="174" width="62" height="16" rx="6" fill="#ff6a3d"/>
+  <rect x="394" y="144" width="100" height="62" rx="14" fill="#e6faf7"/>
+  <rect x="406" y="156" width="40" height="8" rx="4" fill="#9be8de"/>
+  <rect x="406" y="174" width="62" height="16" rx="6" fill="#0ea5a0"/>
+
+  <!-- area chart -->
+  <rect x="170" y="222" width="324" height="138" rx="14" fill="#faf9ff"/>
+  <path d="M184 336 C 220 320, 236 290, 270 296 S 330 262, 360 270 S 430 236, 480 244 L480 346 L184 346 Z" fill="url(#area)"/>
+  <path d="M184 336 C 220 320, 236 290, 270 296 S 330 262, 360 270 S 430 236, 480 244" stroke="#6d4aff" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="360" cy="270" r="7" fill="#fff" stroke="#6d4aff" stroke-width="4"/>
+  <g stroke="#ece8ff"><path d="M184 270H480M184 300H480M184 330H480"/></g>
+  <rect x="184" y="234" width="74" height="10" rx="5" fill="#d9d1ff"/>
+
+  <!-- payslip card -->
+  <g filter="url(#sh2)" transform="rotate(5 520 360)">
+    <rect x="410" y="270" width="190" height="230" rx="18" fill="#ffffff"/>
+  </g>
+  <g transform="rotate(5 520 360)">
+    <rect x="410" y="270" width="190" height="56" rx="18" fill="url(#g2)"/>
+    <rect x="410" y="300" width="190" height="26" fill="url(#g2)"/>
+    <text x="428" y="296" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" fill="#fff" opacity=".9">PAYSLIP</text>
+    <text x="428" y="316" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="800" fill="#fff">LKR 48,250</text>
+    <rect x="428" y="346" width="90" height="9" rx="4.5" fill="#e8e4f5"/><rect x="540" y="346" width="42" height="9" rx="4.5" fill="#cfc7ee"/>
+    <rect x="428" y="368" width="70" height="9" rx="4.5" fill="#e8e4f5"/><rect x="540" y="368" width="42" height="9" rx="4.5" fill="#cfc7ee"/>
+    <rect x="428" y="390" width="80" height="9" rx="4.5" fill="#e8e4f5"/><rect x="540" y="390" width="42" height="9" rx="4.5" fill="#cfc7ee"/>
+    <rect x="428" y="420" width="154" height="1.5" fill="#e8e4f5"/>
+    <rect x="428" y="436" width="60" height="11" rx="5.5" fill="#5b3df5"/><rect x="520" y="436" width="62" height="11" rx="5.5" fill="#0ea5a0"/>
+    <rect x="428" y="462" width="154" height="22" rx="11" fill="#f3f0ff"/>
+    <text x="505" y="478" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="11" font-weight="700" fill="#5b3df5">DOWNLOAD PDF</text>
+  </g>
+
+  <!-- attendance device -->
+  <g filter="url(#sh2)">
+    <rect x="20" y="300" width="132" height="200" rx="22" fill="#241a63"/>
+  </g>
+  <rect x="34" y="314" width="104" height="64" rx="12" fill="#120c3a"/>
+  <text x="86" y="344" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="800" fill="#7ef5e4">08:30</text>
+  <text x="86" y="364" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="9" font-weight="600" fill="#9d92e8" letter-spacing="1.5">CHECKED IN</text>
+  <circle cx="86" cy="436" r="40" fill="#3a2a94"/>
+  <circle cx="86" cy="436" r="40" stroke="url(#g3)" stroke-width="3" stroke-dasharray="8 6"/>
+  <g stroke="#b9a9ff" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M68 440c0-10 8-18 18-18s18 8 18 18"/>
+    <path d="M74 452c-2-6-2-10-2-14 0-8 6-14 14-14s14 6 14 14c0 8 2 14 4 18"/>
+    <path d="M80 458c-3-6-4-12-4-20 0-6 4-10 10-10s10 4 10 10c0 6 1 12 3 16"/>
+    <path d="M86 440v10"/>
+  </g>
+
+  <!-- floating coin -->
+  <g filter="url(#sh2)">
+    <circle cx="545" cy="120" r="38" fill="url(#g2)"/>
+  </g>
+  <circle cx="545" cy="120" r="28" stroke="#fff" stroke-opacity=".55" stroke-width="3"/>
+  <text x="545" y="131" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="30" font-weight="800" fill="#fff">$</text>
+
+  <!-- floating avatars pill -->
+  <g filter="url(#sh2)">
+    <rect x="196" y="388" width="206" height="64" rx="32" fill="#ffffff"/>
+  </g>
+  <circle cx="232" cy="420" r="18" fill="url(#g1)"/><text x="232" y="426" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#fff">N</text>
+  <circle cx="262" cy="420" r="18" fill="url(#g2)" stroke="#fff" stroke-width="3"/><text x="262" y="426" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#fff">S</text>
+  <circle cx="292" cy="420" r="18" fill="url(#g3)" stroke="#fff" stroke-width="3"/><text x="292" y="426" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#fff">K</text>
+  <text x="322" y="417" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="800" fill="#241a63">28 present</text>
+  <text x="322" y="434" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="10.5" font-weight="500" fill="#8a84ad">today</text>
+
+  <!-- sparkles -->
+  <g fill="#fff"><path d="M590 250l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" opacity=".9"/><path d="M40 190l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" opacity=".7"/><path d="M300 40l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" opacity=".8"/></g>
+</svg>
