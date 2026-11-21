@@ -4,11 +4,11 @@ const { Pool, types } = require('pg');
 types.setTypeParser(1082, (v) => v);
 
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  database: process.env.DB_NAME || 'payroll_db',
+  host: process.env.DB_HOST ,
+  port: parseInt(process.env.DB_PORT, 10),
+  user: process.env.DB_USER ,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 module.exports = { pool };

@@ -1,4 +1,4 @@
-const BASE = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || 'http://localhost:3001/api';
+const BASE = (window.APP_CONFIG && window.APP_CONFIG.API_URL)';
 
 export const TOKEN_KEY = 'payroll_token';
 export const USER_KEY = 'payroll_user';

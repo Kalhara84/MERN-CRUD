@@ -2,7 +2,7 @@ const { verifyToken } = require('./lib/auth');
 
 /** protects a route: no valid "Authorization: Bearer <token>" -> 401 */
 function requireAuth(req, res, next) {
-  const header = req.headers.authorization || '';
+  const header = req.headers.authorization ;
   const user = header.startsWith('Bearer ') ? verifyToken(header.slice(7)) : null;
   if (!user) return res.status(401).json({ message: 'Unauthorized' });
   req.user = user;
